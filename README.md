@@ -58,13 +58,12 @@
 1. [GitHub 저장소]([https://github.com/계정명/sales-library](https://github.com/계정명/sales-library)) 에서 코드 다운로드: `git clone https://github.com/계정명/sales-library.git`
 2. 프로젝트 폴더로 이동: `cd sales-library`
 3. 패키지 설치: `npm install`
-4. `.env` 파일 생성 후 아래 내용 입력: `REACT_APP_GOOGLE_API_KEY=구글API키` , `REACT_APP_SPREADSHEET_ID=스프레드시트ID` 
+4. `.env` 파일 생성 후 아래 내용 입력: `REACT_APP_GOOGLE_API_KEY=구글API키` , `REACT_APP_SPREADSHEET_ID=스프레드시트ID`
 5. (테스트) 로컬 서버 실행: `npm start`
 
 ### 수정 후 배포 방법
 
 1. 코드 수정
-
 2. 아래 명령어로 GitHub에 업로드:
 
 ```
@@ -73,7 +72,7 @@ git commit -m "수정 내용 개요"
 git push
 ```
 
-3. Vercel이 자동으로 재배포 (약 1~2분 소요)
+1. Vercel이 자동으로 재배포 (약 1~2분 소요)
 
 ---
 
@@ -99,14 +98,12 @@ api/
 
 ## 관련 계정 및 접근 권한
 
-| 항목 | 내용 |
 
-|---|---|
-
-| **배포** | [Vercel]([https://vercel.com](https://vercel.com)) |
-
+| 항목         | 내용                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------- |
+| **배포**     | [Vercel]([https://vercel.com](https://vercel.com))                                     |
 | **코드 저장소** | [GitHub]([https://github.com/계정명/sales-library](https://github.com/계정명/sales-library)) |
+| **데이터**    | Google Spreadsheet                                                                     |
+| **챗봇 AI**  | OpenAI API                                                                             |
 
-| **데이터** | Google Spreadsheet |
 
-| **챗봇 AI** | OpenAI API |

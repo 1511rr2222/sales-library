@@ -47,7 +47,7 @@ function ChatBot({ episode }) {
       const data = await response.json();
       const assistantMessage = {
         role: 'assistant',
-        content: data.content[0].text
+        content: data.choices[0].message.content
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {

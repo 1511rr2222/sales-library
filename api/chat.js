@@ -6,26 +6,26 @@ export default async function handler(req, res) {
     const { messages, systemPrompt } = req.body;
   
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: 'gpt-4o-mini',
           max_tokens: 500,
-          system: systemPrompt,
-          messages: messages
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages
+          ]
         })
       });
   
       const data = await response.json();
-        console.log('Anthropic response:', JSON.stringify(data));
-        res.status(200).json(data);
+      console.log('OpenAI response:', JSON.stringify(data));
+      res.status(200).json(data);
     } catch (error) {
-        console.error('Anthropic API error:', error);
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
   }

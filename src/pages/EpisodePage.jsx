@@ -104,7 +104,7 @@ function EpisodePage() {
           {episode['Why It Matters'] && (
             <div className="mb-8">
               <h2 className="text-lg font-bold text-indigo-600 mb-3">
-                WHY IS IT MATTERS
+                WHY IT MATTERS
               </h2>
 
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">

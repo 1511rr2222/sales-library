@@ -36,8 +36,8 @@ function MainPage() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="max-w-4xl mx-auto w-full flex-1 p-8">
         <Header />
 
         {/* 스위치 */}

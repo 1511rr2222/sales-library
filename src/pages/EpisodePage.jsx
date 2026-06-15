@@ -100,15 +100,15 @@ function EpisodePage() {
             </p>
           </div>
 
-          {/* WHY IS IT MATTERS */}
-          {episode['Why Is It Matters'] && (
+          {/* WHY IT MATTERS */}
+          {episode['Why It Matters'] && (
             <div className="mb-8">
               <h2 className="text-lg font-bold text-indigo-600 mb-3">
                 WHY IS IT MATTERS
               </h2>
 
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {episode['Why Is It Matters']}
+                {episode['Why It Matters']}
               </p>
             </div>
           )}

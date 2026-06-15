@@ -66,7 +66,7 @@ function MainPage() {
       </div>
 
         {/* 뷰 컨테이너 */}
-        <div className="relative min-h-screen">
+        <div className="relative flex-1">
           {/* 역량 뷰 */}
           <div className={`transition-all duration-300 ease-in-out ${
             view === 'competency'

@@ -51,6 +51,13 @@ function EpisodePage() {
           {/* 제목 */}
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{episode.제목}</h1>
 
+          {/* 개요 */}
+          {episode.개요 && (
+            <p className="text-base text-gray-500 opacity-80 mb-5 leading-relaxed">
+              {episode.개요}
+            </p>
+          )}
+
           {/* 역량 해시태그 */}
           <div className="flex flex-wrap gap-2 mb-4">
             {[episode.competency_id_1, episode.competency_id_2, episode.competency_id_3, episode.competency_id_4]
@@ -92,6 +99,19 @@ function EpisodePage() {
               {episode['상황(SITUATION)']}
             </p>
           </div>
+
+          {/* WHY IS IT MATTERS */}
+          {episode['Why Is It Matters'] && (
+            <div className="mb-8">
+              <h2 className="text-lg font-bold text-indigo-600 mb-3">
+                WHY IS IT MATTERS
+              </h2>
+
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {episode['Why Is It Matters']}
+              </p>
+            </div>
+          )}
 
           {/* SALES TIP */}
           <div className="mb-8">

@@ -6,6 +6,7 @@ import { getEpisodes, getMentors, getCompetencies } from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ChatBot from '../components/ChatBot';
 import Footer from '../components/Footer';
+import RichText from '../components/RichText';
 
 function EpisodePage() {
   const { episodeId } = useParams();
@@ -95,9 +96,10 @@ function EpisodePage() {
           {/* SITUATION */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-indigo-600 mb-3">SITUATION</h2>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-              {episode['상황(SITUATION)']}
-            </p>
+            <RichText
+              text={episode['상황(SITUATION)']}
+              highlights={episode['하이라이트']}
+            />
           </div>
 
           {/* WHY IT MATTERS */}
@@ -107,18 +109,20 @@ function EpisodePage() {
                 WHY IT MATTERS
               </h2>
 
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {episode['Why It Matters']}
-              </p>
+              <RichText
+                text={episode['Why It Matters']}
+                highlights={episode['하이라이트']}
+              />
             </div>
           )}
 
           {/* SALES TIP */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-indigo-600 mb-3">SALES TIP</h2>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-              {episode['세일즈팁(SALES TIP)']}
-            </p>
+            <RichText
+              text={episode['세일즈팁(SALES TIP)']}
+              highlights={episode['하이라이트']}
+            />
           </div>
 
 
@@ -146,7 +150,7 @@ function EpisodePage() {
             <div className="bg-indigo-50 rounded-xl p-4">
               {episode.Checklist.split('\n').map((tip, index) => (
                 <div key={index} className="flex items-start gap-2 mb-2">
-                  <span className="text-indigo-400 font-bold">•</span>
+                  <span className="text-indigo-400 font-bold">▢</span>
                   <span className="text-gray-700 text-sm">{tip}</span>
                 </div>
               ))}

@@ -98,7 +98,7 @@ function EpisodePage() {
             <h2 className="text-lg font-bold text-indigo-600 mb-3">SITUATION</h2>
             <RichText
               text={episode['상황(SITUATION)']}
-              highlights={episode['하이라이트']}
+              highlights={episode['하이라이트_SITUATION']}
             />
           </div>
 
@@ -121,7 +121,7 @@ function EpisodePage() {
             <h2 className="text-lg font-bold text-indigo-600 mb-3">SALES TIP</h2>
             <RichText
               text={episode['세일즈팁(SALES TIP)']}
-              highlights={episode['하이라이트']}
+              highlights={episode['하이라이트_SALES TIP']}
             />
           </div>
 

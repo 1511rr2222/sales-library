@@ -13,7 +13,7 @@ function RichText({ text, highlights = "", className = "text-gray-700 leading-re
       const regex = new RegExp(`(${keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
       return line.split(regex).map((part, i) =>
         keywords.includes(part)
-          ? <mark key={i} style={{ backgroundColor: '#FFFF00', borderRadius: '2px', padding: '0 2px' }}>{part}</mark>
+          ? <mark key={i} style={{ backgroundColor: '#FFF000', borderRadius: '2px', padding: '0 2px' }}>{part}</mark>
           : part
       );
     }

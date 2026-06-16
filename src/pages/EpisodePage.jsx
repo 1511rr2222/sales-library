@@ -16,6 +16,7 @@ function EpisodePage() {
   const [mentor, setMentor] = useState(null);
   const [competencies, setCompetencies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([

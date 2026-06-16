@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import { ChevronLeft } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Footer from '../components/Footer';
+import Avatar from 'boring-avatars';
 
 function SkillPage() {
   const { competencyId } = useParams();
@@ -138,9 +139,12 @@ function SkillPage() {
 
                 {mentor && (
                   <div className="flex items-center gap-2 mt-3">
-                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm">👤</span>
-                    </div>
+                    <Avatar
+                      size={30}
+                      name={mentor.mentor_id}
+                      variant="beam"
+                      colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+                    />
                     <div>
                       <span className="text-sm font-medium text-gray-700">{mentor.이름}</span>
                       <span className="text-xs text-gray-400 ml-2">{mentor.직책} | {mentor.팀} | 경력 {mentor.경력}년</span>

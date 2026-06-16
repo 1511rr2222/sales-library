@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { ChevronLeft } from 'lucide-react';
 import { getEpisodes, getMentors, getCompetencies } from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ChatBot from '../components/ChatBot';
@@ -12,116 +11,254 @@ import Avatar from 'boring-avatars';
 function EpisodePage() {
   const { episodeId } = useParams();
   const navigate = useNavigate();
+
   const [episode, setEpisode] = useState(null);
   const [mentor, setMentor] = useState(null);
   const [competencies, setCompetencies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
       getEpisodes().then(data => {
         const found = data.find(e => e.episode_id === episodeId);
         setEpisode(found);
+
         if (found) {
           return getMentors().then(mentors => {
-            const foundMentor = mentors.find(m => m.mentor_id === found.mentor_id);
-            setMentor(foundMentor);
+            setMentor(
+              mentors.find(
+                m => m.mentor_id === found.mentor_id
+              )
+            );
           });
         }
       }),
-      getCompetencies().then(data => setCompetencies(data))
-    ]).then(() => setLoading(false));
+
+      getCompetencies().then(data =>
+        setCompetencies(data)
+      )
+    ])
+    .then(() => setLoading(false));
   }, [episodeId]);
+
 
   if (loading) return <LoadingSpinner />;
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-3xl mx-auto">
-        {/* 뒤로가기 */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate(`/skill/${episode.competency_id_1}`)}
-            className="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-all"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <Header />
-        </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-sm">
+  return (
+    <div
+      className="
+        min-h-screen
+        bg-gray-50
+        px-4
+        py-4
+        md:p-8
+      "
+    >
+
+      <div
+        className="
+          max-w-3xl
+          w-full
+          mx-auto
+        "
+      >
+
+        <Header />
+
+
+        <div
+          className="
+            bg-white
+            rounded-2xl
+            p-5
+            md:p-8
+            shadow-sm
+          "
+        >
+
           {/* 제목 */}
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">{episode.제목}</h1>
+          <h1
+            className="
+              text-xl
+              md:text-3xl
+              font-bold
+              text-gray-800
+              mb-2
+            "
+          >
+            {episode.제목}
+          </h1>
+
 
           {/* 개요 */}
           {episode.개요 && (
-            <p className="text-base text-gray-500 opacity-80 mb-5 leading-relaxed">
+            <p
+              className="
+                text-sm
+                md:text-base
+                text-gray-500
+                opacity-80
+                mb-4 md:mb-6
+                leading-relaxed
+              "
+            >
               {episode.개요}
             </p>
           )}
 
-          {/* 역량 해시태그 */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {[episode.competency_id_1, episode.competency_id_2, episode.competency_id_3, episode.competency_id_4]
-              .filter(id => id)
-              .map(id => {
-                const competency = competencies.find(c => c.competency_id === id);
-                return competency ? (
-                  <span
-                    key={id}
-                    onClick={() => navigate(`/skill/${competency.competency_id}`)}
-                    className="inline-block bg-indigo-50 text-indigo-500 text-xs font-medium px-3 py-1 rounded-md cursor-pointer hover:bg-indigo-100 transition-all"
-                  >
-                    #{competency.역량명}
-                  </span>
-                ) : null;
-              })}
+
+          {/* 역량 */}
+          <div
+            className="
+              flex
+              flex-wrap
+              gap-2
+              mb-5 md:mb-6
+            "
+          >
+            {[
+              episode.competency_id_1,
+              episode.competency_id_2,
+              episode.competency_id_3,
+              episode.competency_id_4
+            ]
+            .filter(Boolean)
+            .map(id => {
+              const competency =
+                competencies.find(
+                  c => c.competency_id === id
+                );
+
+              return competency ? (
+                <span
+                  key={id}
+                  onClick={() =>
+                    navigate(
+                      `/skill/${competency.competency_id}`
+                    )
+                  }
+                  className="
+                    bg-indigo-50
+                    text-indigo-500
+                    text-xs
+                    px-3
+                    py-1
+                    rounded-md
+                    cursor-pointer
+                  "
+                >
+                  #{competency.역량명}
+                </span>
+              ) : null;
+            })}
           </div>
 
-          {/* 멘토 정보 */}
+
+          {/* 멘토 */}
           {mentor && (
             <div
-              onClick={() => navigate(`/mentor/${mentor.mentor_id}`)}
-              className="flex items-center gap-3 mt-4 mb-8 cursor-pointer hover:opacity-80"
+              onClick={() =>
+                navigate(`/mentor/${mentor.mentor_id}`)
+              }
+              className="
+                flex
+                items-center
+                gap-3
+                mt-4
+                mb-5
+                cursor-pointer
+              "
             >
+
               <Avatar
-                size={40}
+                size={36}
                 name={mentor.mentor_id}
                 variant="beam"
-                colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+                colors={[
+                  "#FF6B6B",
+                  "#FFE66D",
+                  "#4ECDC4",
+                  "#45B7D1",
+                  "#96CEB4"
+                ]}
               />
+
               <div>
-                <div className="font-medium text-gray-800">{mentor.이름}</div>
-                <div className="text-sm text-gray-400">{mentor.직책} | {mentor.팀} | 경력 {mentor.경력}년</div>
+                <div className="text-sm font-medium text-gray-800">
+                  {mentor.이름}
+                </div>
+
+                <div className="text-xs text-gray-400">
+                  {mentor.직책} | {mentor.팀} | 경력 {mentor.경력}년
+                </div>
+
               </div>
             </div>
           )}
 
+
           {/* SITUATION */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-indigo-600 mb-3">SITUATION</h2>
+          <div className="mb-6">
+            <h2
+              className="
+                text-base
+                md:text-lg
+                font-bold
+                text-indigo-600
+                mb-2
+              "
+            >
+              SITUATION
+            </h2>
+
             <RichText
               text={episode['상황(SITUATION)']}
               highlights={episode['하이라이트_SITUATION']}
             />
           </div>
 
+
           {/* WHY IT MATTERS */}
-          {episode['Why It Matters'] && (
-            <div className="mb-8">
-              <h2 className="text-lg font-bold text-indigo-600 mb-3">
-                WHY IT MATTERS
-              </h2>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {episode['Why It Matters']}
-              </p>
-            </div>
-          )}
+          <div className="mb-6">
+            <h2
+              className="
+                text-base
+                md:text-lg
+                font-bold
+                text-indigo-600
+                mb-2
+              "
+            >
+              WHY IT MATTERS
+            </h2>
+
+            <p
+              className="
+                text-gray-700
+                leading-relaxed
+                whitespace-pre-line
+              "
+            >
+              {episode['Why It Matters']}
+            </p>
+          </div>
+
 
           {/* SALES TIP */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-indigo-600 mb-3">SALES TIP</h2>
+          <div className="mb-6">
+            <h2
+              className="
+                text-base
+                md:text-lg
+                font-bold
+                text-indigo-600
+                mb-2
+              "
+            >
+              SALES TIP
+            </h2>
+
             <RichText
               text={episode['세일즈팁(SALES TIP)']}
               highlights={episode['하이라이트_SALES TIP']}
@@ -129,40 +266,130 @@ function EpisodePage() {
           </div>
 
 
-          {/* STAR 구조 */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-indigo-600 mb-3">STAR 분석</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* STAR */}
+          <div className="mb-6">
+
+            <h2
+              className="
+                text-base
+                md:text-lg
+                font-bold
+                text-indigo-600
+                mb-2
+              "
+            >
+              STAR 분석
+            </h2>
+
+            <div className="
+              grid
+              grid-cols-1
+              md:grid-cols-2
+              gap-3
+            ">
+
               {[
-                { label: '상황', value: episode['STAR-상황'] },
-                { label: '과제', value: episode['STAR-과제'] },
-                { label: '행동', value: episode['STAR-행동'] },
-                { label: '결과', value: episode['STAR-결과'] },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-gray-50 rounded-xl p-4">
-                  <span className="inline-block bg-indigo-100 text-indigo-600 text-xs font-bold px-2 py-1 rounded-md mb-2">{label}</span>
-                  <div className="text-gray-700 text-sm whitespace-pre-line">{value}</div>
+                ['상황', episode['STAR-상황']],
+                ['과제', episode['STAR-과제']],
+                ['행동', episode['STAR-행동']],
+                ['결과', episode['STAR-결과']]
+              ]
+              .map(([label, value]) => (
+
+                <div
+                  key={label}
+                  className="
+                    bg-gray-50
+                    rounded-xl
+                    p-4
+                  "
+                >
+
+                  <span
+                    className="
+                      text-xs
+                      font-bold
+                      text-indigo-600
+                    "
+                  >
+                    {label}
+                  </span>
+
+                  <p className="
+                    text-sm
+                    text-gray-700
+                    mt-2
+                    whitespace-pre-line
+                  ">
+                    {value}
+                  </p>
+
                 </div>
+
               ))}
+
             </div>
           </div>
 
+
           {/* Checklist */}
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-indigo-600 mb-3">Sales Checklist</h2>
-            <div className="bg-indigo-50 rounded-xl p-4">
-              {episode.Checklist.split('\n').map((tip, index) => (
-                <div key={index} className="flex items-center gap-2 mb-2">
-                  <span className="text-indigo-400 font-bold">▢</span>
-                  <span className="text-gray-700 text-sm">{tip}</span>
+          <div>
+
+            <h2
+              className="
+                text-base
+                md:text-lg
+                font-bold
+                text-indigo-600
+                mb-2
+              "
+            >
+              Sales Checklist
+            </h2>
+
+            <div
+              className="
+                bg-indigo-50
+                rounded-xl
+                p-4
+              "
+            >
+
+              {episode.Checklist
+                .split('\n')
+                .map((tip, index) => (
+
+                <div
+                  key={index}
+                  className="
+                    flex
+                    gap-2
+                    text-sm
+                    mb-2
+                  "
+                >
+                  <span className="text-indigo-400">
+                    ▢
+                  </span>
+
+                  <span>
+                    {tip}
+                  </span>
+
                 </div>
               ))}
+
             </div>
           </div>
+
+
         </div>
       </div>
+
+
       <ChatBot episode={episode} />
       <Footer />
+
     </div>
   );
 }

@@ -92,6 +92,24 @@ function EpisodePage() {
             </div>
           )}
 
+          {/* STAR 구조 */}
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-indigo-600 mb-3">STAR 분석</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { label: '상황', value: episode['STAR-상황'] },
+                { label: '과제', value: episode['STAR-과제'] },
+                { label: '행동', value: episode['STAR-행동'] },
+                { label: '결과', value: episode['STAR-결과'] },
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-gray-50 rounded-xl p-4">
+                  <span className="inline-block bg-indigo-100 text-indigo-600 text-xs font-bold px-2 py-1 rounded-md mb-2">{label}</span>
+                  <div className="text-gray-700 text-sm whitespace-pre-line">{value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
           {/* SITUATION */}
           <div className="mb-8">
             <h2 className="text-lg font-bold text-indigo-600 mb-3">SITUATION</h2>
@@ -121,23 +139,6 @@ function EpisodePage() {
             </p>
           </div>
 
-          {/* STAR 구조 */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-indigo-600 mb-3">STAR 분석</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { label: '상황', value: episode['STAR-상황'] },
-                { label: '과제', value: episode['STAR-과제'] },
-                { label: '행동', value: episode['STAR-행동'] },
-                { label: '결과', value: episode['STAR-결과'] },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-gray-50 rounded-xl p-4">
-                  <span className="inline-block bg-indigo-100 text-indigo-600 text-xs font-bold px-2 py-1 rounded-md mb-2">{label}</span>
-                  <div className="text-gray-700 text-sm whitespace-pre-line">{value}</div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Checklist */}
           <div className="mb-6">

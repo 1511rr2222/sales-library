@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import { ChevronLeft } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Footer from '../components/Footer';
+import Avatar from 'boring-avatars';
 
 function MentorPage() {
   const { mentorId } = useParams();
@@ -47,9 +48,14 @@ function MentorPage() {
         <div className="bg-white rounded-2xl p-8 shadow-sm mb-6">
           {/* 프로필 */}
           <div className="flex items-center gap-6 mb-4">
-            <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center">
-              <span className="text-4xl">👤</span>
-            </div>
+          <div className="mb-3 flex justify-center">
+            <Avatar
+              size={64}
+              name={mentor.mentor_id}
+              variant="beam"
+              colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+            />
+          </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-800">{mentor.이름}</h1>
               <div className="text-gray-500">{mentor.직책} | {mentor['담당 상품']} | {mentor.팀}</div>

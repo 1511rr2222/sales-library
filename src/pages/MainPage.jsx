@@ -4,6 +4,7 @@ import { getMentors, getCompetencies } from '../api';
 import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Footer from '../components/Footer';
+import Avatar from 'boring-avatars';
 
 function MainPage() {
   const [competencies, setCompetencies] = useState([]);
@@ -108,8 +109,13 @@ function MainPage() {
                   onClick={() => navigate(`/mentor/${mentor.mentor_id}`)}
                   className="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg cursor-pointer transition-all duration-200 border border-gray-100 hover:border-indigo-300 hover:-translate-y-1 hover:bg-indigo-50"
                 >
-                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-3 mx-auto">
-                    <span className="text-2xl">👤</span>
+                  <div className="mb-3 flex justify-center">
+                    <Avatar
+                      size={64}
+                      name={mentor.mentor_id}
+                      variant="beam"
+                      colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+                    />
                   </div>
                   <div className="text-center">
                     <div className="font-semibold text-gray-800">{mentor.이름} {mentor.직책}</div>

@@ -63,7 +63,6 @@ const rules = `
     [설정된 상황]
     - 고객 유형: ${customerType}
     - 현재 상황: ${situation}
-    ${extraCondition ? `- 추가 조건: ${extraCondition}` : ''}
     
     [지침]
     ${rules}

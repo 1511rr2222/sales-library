@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send } from 'lucide-react';
+import { getSystemPrompt } from '../prompts'; // 프롬프트 가져오기
 
 function RoleplayPanel({ episodes, competencies }) {
   const navigate = useNavigate();
@@ -13,8 +14,6 @@ function RoleplayPanel({ episodes, competencies }) {
 
   const userTurnCount = messages.filter(m => m.role === 'user').length;
   const MAX_TURNS = 6;
-  
-  const systemPrompt = `고객 유형: ${customerType}, 상황: ${situation}에 맞게 영업 롤플레잉을 진행해줘.`;
 
   const handleStart = async () => {
     if (!customerType || !situation) return alert('모두 선택해주세요!');
@@ -22,6 +21,9 @@ function RoleplayPanel({ episodes, competencies }) {
     setIsLoading(true);
 
     try {
+      // 1. 프롬프트 생성 (외부 프롬프트 파일 + 선택한 상황 설정)
+      const systemPrompt = `${getSystemPrompt()}\n\n[상황설정]\n고객: ${customerType}\n상황: ${situation}`;
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,6 +50,7 @@ function RoleplayPanel({ episodes, competencies }) {
     setIsLoading(true);
 
     try {
+      const systemPrompt = `${getSystemPrompt()}\n\n[상황설정]\n고객: ${customerType}\n상황: ${situation}`;
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,28 +63,31 @@ function RoleplayPanel({ episodes, competencies }) {
     } catch (error) { console.error(error); } finally { setIsLoading(false); }
   };
 
-  const handleEnd = async () => setStep('result');
+  const handleEnd = () => setStep('result');
+
+  // 중복 없는 고객 유형 목록
+  const customerTypes = [...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02]).filter(Boolean))];
+  
+  // 선택한 유형에 맞는 중복 없는 문제 상황 목록
+  const situations = [...new Set(
+    episodes.filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType)
+            .flatMap(e => [e.문제상황_01, e.문제상황_02])
+            .filter(Boolean)
+  )];
 
   if (step === 'setup') {
     return (
       <div className="p-6 bg-white rounded-2xl shadow-sm border-2 border-purple-200 max-w-xl mx-auto">
         <h2 className="text-2xl font-bold mb-5 text-purple-800">영업 롤플레잉 설정</h2>
         
-        {/* 고객 유형 선택 - _01, _02 모두 처리 */}
         <select className="w-full mb-3 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setCustomerType(e.target.value)}>
           <option value="">고객 유형 선택</option>
-          {[...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02].filter(Boolean)))].map(type => 
-            <option key={type} value={type}>{type}</option>
-          )}
+          {customerTypes.map(type => <option key={type} value={type}>{type}</option>)}
         </select>
 
-        {/* 문제 상황 선택 - _01, _02 모두 처리 및 빈 값 방어 */}
         <select className="w-full mb-6 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setSituation(e.target.value)}>
           <option value="">문제 상황 선택</option>
-          {episodes
-            .filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType)
-            .flatMap(e => [e.문제상황_01, e.문제상황_02].filter(Boolean))
-            .map((sit, idx) => <option key={idx} value={sit}>{sit}</option>)}
+          {situations.map((sit, idx) => <option key={idx} value={sit}>{sit}</option>)}
         </select>
 
         <button onClick={handleStart} className="w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition">

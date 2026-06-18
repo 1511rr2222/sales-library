@@ -127,7 +127,13 @@ function RoleplayPanel({ episodes, navigate }) {
             {isMistake && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex justify-between items-center mx-4">
                 <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
-                <button onClick={() => navigate(`/episode/${selectedEpisode.id}`)} className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg">우수 사례 보기</button>
+                {/* 기존 코드 */}
+              <button 
+                onClick={() => navigate(`/episode/${selectedEpisode.episode_id}`)} // .id를 .episode_id로 수정!
+                className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg"
+>
+              우수 사례 보기
+              </button>
               </div>
             )}
           </div>

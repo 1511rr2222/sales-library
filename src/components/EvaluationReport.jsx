@@ -1,9 +1,8 @@
-//EvaluationReport.jsx
-
 import React from 'react';
 
-function EvaluationReport({ reportData }) {
-  // reportData 예시: { score: 18, passed: false, pros: [], cons: [], tip: "" }
+export default function EvaluationReport({ reportData }) {
+  
+    // reportData 예시: { score: 18, passed: false, pros: [], cons: [], tip: "" }
   
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
@@ -42,3 +41,5 @@ function EvaluationReport({ reportData }) {
     </div>
   );
 }
+// EvaluationReport.jsx 파일 맨 마지막 줄에 추가
+export default EvaluationReport;

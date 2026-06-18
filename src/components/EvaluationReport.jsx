@@ -1,14 +1,9 @@
 import React from 'react';
 
-export default function EvaluationReport({ reportData }) {
-  
-    // reportData 예시: { score: 18, passed: false, pros: [], cons: [], tip: "" }
-  
+function EvaluationReport({ reportData }) {
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
       <h2 className="text-xl font-bold text-purple-900 mb-6 text-center">훈련 결과 리포트</h2>
-      
-      {/* 점수 그래프 영역 */}
       <div className="flex justify-center mb-8">
         <div className="relative w-32 h-32">
           <div className="absolute inset-0 flex items-center justify-center text-3xl font-black text-purple-600">
@@ -21,8 +16,6 @@ export default function EvaluationReport({ reportData }) {
           </svg>
         </div>
       </div>
-
-      {/* 핵심 카드 */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="p-4 bg-green-50 rounded-xl">
           <p className="text-[10px] text-green-600 font-bold uppercase">잘한 점</p>
@@ -33,7 +26,6 @@ export default function EvaluationReport({ reportData }) {
           <ul className="text-xs text-red-900 mt-2 list-disc pl-4">{reportData.cons.map(c => <li key={c}>{c}</li>)}</ul>
         </div>
       </div>
-
       <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
         <p className="text-[10px] text-purple-600 font-bold uppercase text-center">핵심 노하우</p>
         <p className="text-sm text-purple-900 font-medium text-center mt-2">{reportData.tip}</p>
@@ -41,5 +33,5 @@ export default function EvaluationReport({ reportData }) {
     </div>
   );
 }
-// EvaluationReport.jsx 파일 맨 마지막 줄에 추가
-export default EvaluationReport;
+
+export default EvaluationReport; // 딱 한 번만 마지막에 써주세요!

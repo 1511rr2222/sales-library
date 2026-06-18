@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getEpisodes } from '../api/spreadsheet';
+import { getEpisodes } from '../../api/spreadsheet';
 
 export default function RolePlayPanel() {
   const [customerTypes, setCustomerTypes] = useState([]);

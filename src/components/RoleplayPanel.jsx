@@ -3,31 +3,44 @@ import { useNavigate } from 'react-router-dom';
 import { Send } from 'lucide-react';
 import { getSystemPrompt } from './prompts';
 
-function RoleplayPanel({ episodes, competencies }) {
+function RoleplayPanel({ episodes }) {
   const navigate = useNavigate();
   const [step, setStep] = useState('setup');
   const [customerType, setCustomerType] = useState('');
   const [situation, setSituation] = useState('');
+  const [selectedEpisode, setSelectedEpisode] = useState(null); // 필터링된 에피소드 고정
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const userTurnCount = messages.filter(m => m.role === 'user').length;
   const MAX_TURNS = 6;
 
-  // 힌트 함수 추가
-  const handleHint = () => {
-    const hintText = "💡 [힌트] 고객의 고민을 먼저 경청하고, 공감하는 태도를 보여주세요.";
-    setMessages(prev => [...prev, { role: 'assistant', content: hintText }]);
-  };
+  // 에피소드에 따른 필터링 로직
+  const customerTypes = [...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02]).filter(Boolean))];
+  const situations = [...new Set(
+    episodes.filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType)
+            .flatMap(e => [e.문제상황_01, e.문제상황_02])
+            .filter(Boolean)
+  )];
 
   const handleStart = async () => {
     if (!customerType || !situation) return alert('모두 선택해주세요!');
+
+    // 1. 조건에 맞는 에피소드 랜덤 선택
+    const matches = episodes.filter(e => 
+      (e.고객유형_01 === customerType || e.고객유형_02 === customerType) &&
+      (e.문제상황_01 === situation || e.문제상황_02 === situation)
+    );
+    const targetEpisode = matches[Math.floor(Math.random() * matches.length)];
+    setSelectedEpisode(targetEpisode);
+
     setStep('chat');
     setIsLoading(true);
 
     try {
-      const systemPrompt = `${getSystemPrompt()}\n\n[상황설정]\n고객: ${customerType}\n상황: ${situation}`;
+      // 2. 외부 prompts.js의 함수에 에피소드 데이터 전달
+      const systemPrompt = getSystemPrompt(customerType, situation, targetEpisode);
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,7 +59,8 @@ function RoleplayPanel({ episodes, competencies }) {
     setIsLoading(true);
 
     try {
-      const systemPrompt = `${getSystemPrompt()}\n\n[상황설정]\n고객: ${customerType}\n상황: ${situation}`;
+      // 대화 중에도 동일한 에피소드 데이터를 참조
+      const systemPrompt = getSystemPrompt(customerType, situation, selectedEpisode);
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,18 +68,9 @@ function RoleplayPanel({ episodes, competencies }) {
       });
       const data = await response.json();
       setMessages([...newMessages, { role: 'assistant', content: data.content[0].text }]);
-      if (newMessages.filter(m => m.role === 'user').length >= MAX_TURNS) handleEnd();
+      if (newMessages.filter(m => m.role === 'user').length >= MAX_TURNS) setStep('result');
     } catch (error) { console.error(error); } finally { setIsLoading(false); }
   };
-
-  const handleEnd = () => setStep('result');
-
-  const customerTypes = [...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02]).filter(Boolean))];
-  const situations = [...new Set(
-    episodes.filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType)
-            .flatMap(e => [e.문제상황_01, e.문제상황_02])
-            .filter(Boolean)
-  )];
 
   if (step === 'setup') {
     return (
@@ -86,29 +91,36 @@ function RoleplayPanel({ episodes, competencies }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[600px]">
+      {/* ... 상단 헤더, 메시지 렌더링, 입력창 UI는 동일하게 유지 ... */}
       <div className="px-4 py-4 border-b border-purple-50 flex items-center justify-between">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2"><span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">고객유형</span><span className="font-bold text-purple-900 text-sm">{customerType}</span></div>
-          <div className="flex items-center gap-2"><span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">해결과제</span><span className="text-xs text-purple-600 font-medium">{situation}</span></div>
+          <div className="flex items-center gap-2"><span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">고객</span><span className="font-bold text-purple-900 text-sm">{customerType}</span></div>
+          <div className="flex items-center gap-2"><span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">상황</span><span className="text-xs text-purple-600 font-medium">{situation}</span></div>
         </div>
-        <button onClick={handleEnd} className="px-4 py-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all rounded-lg text-sm font-bold shadow-sm">종료</button>
+        <button onClick={() => setStep('setup')} className="px-4 py-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-sm font-bold">종료</button>
       </div>
-
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
         {messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[75%] px-3 py-2 rounded-xl text-sm ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>{msg.content}</div>
+            <div className={`max-w-[75%] px-3 py-2 rounded-xl text-sm whitespace-pre-line ${msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>{msg.content}</div>
           </div>
         ))}
+        {isLoading && (
+    <div className="flex justify-start">
+      <div className="px-3 py-2 rounded-xl text-sm bg-purple-50 text-purple-400 animate-pulse">
+        챗봇이 답변을 작성 중입니다...
       </div>
+    </div>
+  )}
 
-      <div className="px-3 py-2 border-t border-purple-50">
-        <button onClick={handleHint} className="w-full mb-2 py-1.5 text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition">💡 힌트 보기</button>
-        <div className="flex items-center gap-2">
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="메시지를 입력하세요..." className="flex-1 text-sm border border-purple-100 rounded-xl px-3 py-2 outline-none focus:border-purple-400" />
-          <button onClick={handleSend} className="w-9 h-9 bg-purple-600 text-white rounded-full flex items-center justify-center hover:bg-purple-700"><Send size={16} /></button>
-        </div>
       </div>
+     <input 
+  value={input} 
+  disabled={isLoading} // [추가] 로딩 중엔 입력 불가
+  onChange={e => setInput(e.target.value)} 
+  placeholder={isLoading ? "답변을 기다리는 중..." : "메시지를 입력하세요..."} 
+  className="..." 
+/> {/* 입력부 생략 */}
     </div>
   );
 }

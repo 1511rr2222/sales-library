@@ -48,6 +48,11 @@ function MainPage() {
           {/* HEADER (통일 기준) */}
           <Header />
 
+          <RoleplayPanel 
+            episodes={episodes} 
+            competencies={competencies} 
+          />
+
           {/* SWITCH */}
           <div className="mt-6 mb-8">
             <div className="relative inline-flex w-52 bg-gray-200 rounded-full p-1">

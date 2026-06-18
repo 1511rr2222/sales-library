@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
+import Avatar from 'boring-avatars'; // 아바타 라이브러리
 import { getSystemPrompt } from './prompts';
 
-function RoleplayPanel({ episodes }) {
+function RoleplayPanel({ episodes, navigate }) { // navigate 추가
   const [step, setStep] = useState('setup');
   const [customerType, setCustomerType] = useState('');
   const [situation, setSituation] = useState('');
@@ -10,24 +11,32 @@ function RoleplayPanel({ episodes }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [favorability, setFavorability] = useState(50); // 호감도 상태
+  const [favorability, setFavorability] = useState(50);
+  const [isMistake, setIsMistake] = useState(false); // 실수(호감도 하락) 여부
 
   const MAX_TURNS = 6;
+
+  // 호감도에 따른 아바타 색상 테마
+  const getFavorabilityColors = (score) => {
+    if (score >= 70) return ["#10B981", "#34D399", "#A7F3D0"];
+    if (score >= 40) return ["#6366F1", "#818CF8", "#C7D2FE"];
+    return ["#F43F5E", "#FB7185", "#FDA4AF"];
+  };
 
   const handleStart = async () => {
     if (!customerType || !situation) return alert('모두 선택해주세요!');
     
-    // 1. 딱 한 행만 필터링하여 랜덤 선택
     const matches = episodes.filter(e => 
       (e.고객유형_01 === customerType || e.고객유형_02 === customerType) &&
       (e.문제상황_01 === situation || e.문제상황_02 === situation)
     );
     if (matches.length === 0) return alert('조건에 맞는 상황이 없습니다.');
+    
     const targetEpisode = matches[Math.floor(Math.random() * matches.length)];
     setSelectedEpisode(targetEpisode);
-
     setStep('chat');
     setFavorability(50);
+    setIsMistake(false);
     setIsLoading(true);
 
     try {
@@ -58,15 +67,20 @@ function RoleplayPanel({ episodes }) {
       });
       const data = await response.json();
       const reply = data.content[0].text;
-      if (reply.includes("[SESSION_END]")) {
-    setMessages([...newMessages, { role: 'assistant', content: reply }]);
-    setStep('result'); // 바로 결과 화면으로 전환
-    setIsLoading(false);
-    return;
-  }
-      // 호감도 파싱 (챗봇이 [호감도: XX]로 응답한다고 가정)
+      
+      // 호감도 파싱 및 하락 감지
       const match = reply.match(/\[호감도: (\d+)\]/);
-      if (match) setFavorability(parseInt(match[1]));
+      if (match) {
+        const newScore = parseInt(match[1]);
+        if (newScore < favorability) setIsMistake(true);
+        setFavorability(newScore);
+      }
+
+      if (reply.includes("[SESSION_END]")) {
+        setMessages([...newMessages, { role: 'assistant', content: reply }]);
+        setStep('result');
+        return;
+      }
 
       setMessages([...newMessages, { role: 'assistant', content: reply }]);
       if (newMessages.filter(m => m.role === 'user').length >= MAX_TURNS) setStep('result');
@@ -93,16 +107,18 @@ function RoleplayPanel({ episodes }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
-      {/* 헤더 및 호감도 */}
-      <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50">
-        <div className="flex justify-between items-center mb-3">
-          <div>
-            <div className="text-purple-600 text-[10px] font-bold uppercase">고객 호감도</div>
-            <div className="font-extrabold text-purple-900 text-lg">{favorability}%</div>
+      {/* 헤더 및 아바타 */}
+      <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-purple-600 uppercase">고객 유형</span>
+            <span className="font-extrabold text-purple-950 text-base">{customerType}</span>
+            <span className="text-[10px] font-bold text-purple-600 uppercase mt-1">현재 상황</span>
+            <span className="text-sm text-purple-800 font-semibold">{situation}</span>
           </div>
-          <button onClick={() => setStep('setup')} className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1 rounded-lg">종료</button>
         </div>
-        <div className="w-full bg-purple-100 rounded-full h-2"><div className="bg-purple-600 h-2 rounded-full transition-all" style={{ width: `${favorability}%` }}></div></div>
+        <button onClick={() => setStep('setup')} className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white">종료</button>
       </div>
 
       {/* 대화창 */}
@@ -112,7 +128,15 @@ function RoleplayPanel({ episodes }) {
             <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>{m.content}</div>
           </div>
         ))}
-        {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">답변 작성 중...</div>}
+        {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">작성 중...</div>}
+        
+        {/* 실수 시 나타나는 우수 사례 버튼 */}
+        {isMistake && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex justify-between items-center mx-4">
+            <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
+            <button onClick={() => navigate(`/episode/${selectedEpisode.id}`)} className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg">우수 사례 보기</button>
+          </div>
+        )}
       </div>
 
       {/* 입력 및 힌트 */}

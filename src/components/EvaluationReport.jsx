@@ -1,48 +1,61 @@
 import React from 'react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
-function EvaluationReport({ reportData }) {
+const EvaluationReport = ({ reportData }) => {
+  // 1. 데이터가 없을 경우 기본값 설정 (기본 30점)
+  const defaultScores = { '신뢰/관계': 30, '니즈 파악': 30, '솔루션 제안': 30, '매너': 30 };
+  const scores = reportData?.scores || defaultScores;
+  
+  // 차트용 데이터 형식 변환
+  const data = Object.keys(scores).map(key => ({
+    subject: key,
+    A: scores[key],
+    fullMark: 100,
+  }));
 
-  const chartData = [
-    { subject: '신뢰/관계', A: reportData?.scores?.신뢰 || 0 },
-    { subject: '니즈 파악', A: reportData?.scores?.니즈파악 || 0 },
-    { subject: '솔루션 제안', A: reportData?.scores?.솔루션 || 0 },
-    { subject: '매너', A: reportData?.scores?.매너 || 0 },
-  ];
+  // 2. 내용 가져오기 (데이터 없으면 빈 배열)
+  const 핵심노하우 = reportData?.핵심노하우 || ["대화 분석을 통해 맞춤형 노하우가 생성됩니다."];
+  const 주의점 = reportData?.주의점 || ["대화를 분석 중입니다."];
 
   return (
- <div className="p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
-      {/* 1. 성공/실패 뱃지 */}
-      <div className="text-center mb-6">
-        <span className={`px-4 py-2 rounded-full font-bold ${reportData.status === '성공' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-          {reportData.status === '성공' ? '🎉 성공적인 상담!' : '더 나은 제안을 위한 연습'}
-        </span>
-      </div>
-
-      {/* 2. 가시적인 그래프 */}
-      <div className="h-64 mb-6">
+    <div className="space-y-6">
+      {/* 레이더 차트 */}
+      <div className="h-64 w-full bg-white rounded-2xl p-4 shadow-sm border border-purple-100">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid />
             <PolarAngleAxis dataKey="subject" />
-            <Radar name="능력" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+            <PolarRadiusAxis angle={30} domain={[0, 100]} />
+            <Radar name="Score" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
           </RadarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* 3. 핵심 노하우 */}
-      <div className="mb-6 p-4 bg-purple-50 rounded-xl">
-        <h3 className="font-bold text-purple-900 mb-2">핵심 노하우</h3>
-        <p className="text-sm text-purple-700">{reportData.노하우}</p>
+      {/* 핵심 노하우 영역 */}
+      <div className="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm">
+        <h3 className="font-bold text-purple-900 mb-3 text-lg">핵심 노하우</h3>
+        <ul className="space-y-2">
+          {핵심노하우.map((item, i) => (
+            <li key={i} className="text-sm text-gray-700 flex items-start">
+              <span className="text-purple-500 mr-2">•</span> {item}
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {/* 4. 꿀 Tip! */}
-      <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-100">
-        <h3 className="font-bold text-yellow-800 mb-2">💡 꿀 Tip!</h3>
-        <p className="text-sm text-yellow-700">{reportData.꿀팁}</p>
+      {/* 주의점 (꿀Tip에서 변경) 영역 */}
+      <div className="bg-yellow-50 p-5 rounded-2xl border border-yellow-100 shadow-sm">
+        <h3 className="font-bold text-yellow-800 mb-3 text-lg">💡 이 점을 주의하세요!</h3>
+        <ul className="space-y-2">
+          {주의점.map((item, i) => (
+            <li key={i} className="text-sm text-yellow-700 flex items-start">
+              <span className="text-yellow-500 mr-2">!</span> {item}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
-}
+};
 
 export default EvaluationReport;

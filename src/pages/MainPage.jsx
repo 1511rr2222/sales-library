@@ -41,6 +41,11 @@ function MainPage() {
     { name: 'Curator', subtitle: '고객 맞춤형 큐레이션 스킬', color: 'border-green-500', light: 'bg-green-50' },
   ];
 
+  const filteredEpisodes = episodes.filter(e => 
+  (selectedCustomer === 'All' || e.고객유형_01 === selectedCustomer || e.고객유형_02 === selectedCustomer) &&
+  (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
+  );
+
   const filteredCompetencies = competencies;
 
   if (loading) return <LoadingSpinner />;
@@ -87,22 +92,30 @@ function MainPage() {
   {/* // [수정] 필터가 선택되었는지 확인 (All이 아니면 필터링 모드) */}
   {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (
     <div className="mb-10">
-      <h3 className="font-bold text-lg mb-4 text-purple-800">검색된 에피소드</h3>
+      <h3 className="font-bold text-lg mb-4 text-purple-800">
+        검색된 에피소드 ({filteredEpisodes.length}건)
+        </h3>
       <div className="grid gap-3">
-        {episodes
-          .filter(e => 
-            (selectedCustomer === 'All' || e.고객유형_01 === selectedCustomer || e.고객유형_02 === selectedCustomer) &&
-            (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
-          )
-          .map(e => (
-            <div key={e.episode_id} onClick={() => navigate(`/episode/${e.episode_id}`)} className="p-4 bg-white border border-purple-100 rounded-xl shadow-sm hover:border-purple-300 cursor-pointer transition">
-              <p className="font-bold text-sm text-purple-950">{e.에피소드제목}</p>
-              <p className="text-xs text-gray-500 mt-1">{e.간단설명}</p>
-            </div>
-          ))}
-      </div>
+      {filteredEpisodes.map(e => (
+        <div 
+          key={e.episode_id} 
+          onClick={() => navigate(`/episode/${e.episode_id}`)} 
+          className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition-all border-l-4 border-l-purple-400"
+        >
+          {/* // [수정: EpisodePage 코드의 'episode.제목'과 일치시킴] */}
+          <p className="font-bold text-base text-gray-900">{e.제목}</p>
+          
+          {/* // [수정: EpisodePage 코드의 'episode.개요'와 일치시킴] */}
+          <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+            {e.개요 || "상세 설명이 없습니다."}
+          </p>
+          
+          {/* // [선택] 태그 영역을 넣고 싶다면 여기 e.competency_id_1 등을 활용하세요 */}
+        </div>
+      ))}
     </div>
-  ) : (
+  </div>
+) : ( 
     /* // [수정] 필터가 없을 때만 기존 역량 리스트를 보여줌 */
     areas.map(area => (
       <div key={area.name} className="mb-10">

@@ -55,13 +55,13 @@ function EpisodePage() {
 
         {location.state?.from === 'roleplay' && (
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate('/roleplay')} 
             className="mb-4 flex items-center text-sm font-bold text-gray-500 hover:text-gray-800"
           >
             &lt; 롤플레잉으로 돌아가기
           </button>
         )}
-        
+
         <Header />
 
         <div className="bg-white rounded-2xl p-5 md:p-8 shadow-sm">
@@ -181,20 +181,23 @@ function EpisodePage() {
             </div>
           </div>
 
-          {/* Checklist */}
-          <div>
-            <h2 className="text-base md:text-lg font-bold text-indigo-600 mb-2">
-              Sales Checklist
-            </h2>
-            <div className="bg-indigo-50 rounded-xl p-4">
-              {episode.Checklist.split('\n').map((tip, index) => (
-                <div key={index} className="flex gap-2 text-sm mb-2">
-                  <span className="text-indigo-400">&#9634;</span>
-                  <span>{tip}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+{/* Checklist 영역 시작 */}
+{episode.Checklist && (
+  <div>
+    <h2 className="text-base md:text-lg font-bold text-indigo-600 mb-2">
+      Sales Checklist
+    </h2>
+    <div className="bg-indigo-50 rounded-xl p-4">
+      {episode.Checklist.split('\n').map((tip, index) => (
+        <div key={index} className="flex gap-2 text-sm mb-2">
+          <span className="text-indigo-400">&#9634;</span>
+          <span>{tip}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+{/* Checklist 영역 끝 */}
 
         </div>
       </div>

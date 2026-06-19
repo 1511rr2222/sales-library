@@ -177,23 +177,23 @@ return (
             ))}
             {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">작성 중...</div>}
             {isMistake && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex justify-between items-center mx-4">
-                <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
-                <button 
-                  onClick={() => {
-                    const id = selectedEpisode?.episode_id;
-                    if (id) {
-                      navigate(`/episode/${id}`, { state: { from: 'roleplay' } });
-    } else {
-      alert("에피소드 ID를 찾을 수 없습니다.");
-    }
-  }}
-  className="..."
->
-                  우수 사례 보기
-                </button>
-              </div>
-            )}
+  <div className="p-4 bg-white border border-red-200 shadow-sm rounded-2xl flex justify-between items-center mx-4 my-2">
+    <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
+    <button 
+      onClick={() => {
+        const id = selectedEpisode?.episode_id;
+        if (id) {
+          navigate(`/episode/${id}`, { state: { from: 'roleplay' } });
+        } else {
+          alert("에피소드 ID를 찾을 수 없습니다.");
+        }
+      }}
+      className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
+    >
+      우수사례
+    </button>
+  </div>
+)}
           </div>
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">💡 힌트 보기</button>

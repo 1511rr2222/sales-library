@@ -28,19 +28,24 @@ function EpisodePage() {
   };
 
   useEffect(() => {
+    setLoading(true); // 로딩 시작 명시
     Promise.all([
       getEpisodes().then(data => {
-        const found = data.find(e => e.episode_id === episodeId);
-        setEpisode(found);
+        const found = data.find(e => String(e.episode_id) === String(episodeId));
+
         if (found) {
-          return getMentors().then(mentors => {
+        setEpisode(found);
+        return getMentors().then(mentors => {
             setMentor(mentors.find(m => m.mentor_id === found.mentor_id));
           });
+        } else {
+          console.error("에피소드를 찾을 수 없습니다. ID:", episodeId);
         }
       }),
       getCompetencies().then(data => setCompetencies(data))
     ]).then(() => setLoading(false));
   }, [episodeId]);
+
 
   if (loading) return <LoadingSpinner />;
 

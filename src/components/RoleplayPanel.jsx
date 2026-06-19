@@ -3,8 +3,10 @@ import { Send } from 'lucide-react';
 import Avatar from 'boring-avatars';
 import { getSystemPrompt } from './prompts';
 import EvaluationReport from './EvaluationReport';
+import { useNavigate } from 'react-router-dom';
 
-function RoleplayPanel({ episodes, navigate }) {
+function RoleplayPanel({ episodes }) {
+  const navigate = useNavigate();
   const [step, setStep] = useState('setup');
   const [customerType, setCustomerType] = useState('');
   const [situation, setSituation] = useState('');
@@ -138,16 +140,25 @@ return (
             {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">작성 중...</div>}
             {isMistake && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex justify-between items-center mx-4">
-                <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
-                {/* 기존 코드 */}
-              <button 
-                onClick={() => navigate(`/episode/${selectedEpisode.episode_id}`)} // .id를 .episode_id로 수정!
-                className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg"
->
-              우수 사례 보기
-              </button>
-              </div>
-            )}
+    <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
+    <button 
+      onClick={() => {
+        // 선택된 에피소드 ID 확인
+        const id = selectedEpisode?.episode_id;
+        console.log("이동할 ID:", id); // 브라우저 콘솔에서 확인 가능
+        
+        if (id) {
+          navigate(`/episode/${id}`);
+        } else {
+          alert("에피소드 ID를 찾을 수 없습니다. 시트 데이터 형식을 확인하세요.");
+        }
+      }}
+      className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg"
+    >
+      우수 사례 보기
+    </button>
+  </div>
+)}
           </div>
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">💡 힌트 보기</button>

@@ -14,6 +14,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
   const [selectedEpisode, setSelectedEpisode] = useState(() => JSON.parse(sessionStorage.getItem('rp_selectedEpisode')) || null);
   const [favorability, setFavorability] = useState(() => parseInt(sessionStorage.getItem('rp_favorability')) || 50);
 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMistake, setIsMistake] = useState(false);

@@ -33,10 +33,15 @@ function Header() {
       className={isMobile ? 'text-sm font-semibold' : 'text-left w-full'}
     >
       {isMobile ? (
-        <h1 className="text-sm font-semibold text-gray-800">Sales Tip Book</h1>
+        <>
+          <img src="/logo.png" alt="Logo" className="h-6 w-auto" />
+          <h1 className="text-sm font-semibold text-gray-800">Sales Tip Book</h1>
+        </>
       ) : (
         <div className="w-full">
-          {/* 메인 타이틀 */}
+          {/* // [수정] 로고 추가 */}
+          <img src="/logo.png" alt="Company Logo" className="h-12 w-auto mb-4" />
+          {/* // [수정] 아래 h1부터 설명 박스까지가 기존 코드 그대로 복구되어야 합니다 */}
           <h1
             className="text-5xl md:text-6xl font-normal tracking-tight leading-tight mb-4"
             style={{ fontFamily: "'DM Serif Display', serif" }}
@@ -54,7 +59,6 @@ function Header() {
             </span>
           </h1>
 
-          {/* 설명 박스 */}
           <div
             className="rounded-xl px-5 py-4 mt-2"
             style={{

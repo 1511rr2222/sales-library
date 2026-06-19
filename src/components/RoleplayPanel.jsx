@@ -26,6 +26,18 @@ function RoleplayPanel({ episodes }) {
     return ["#F43F5E", "#FB7185", "#FDA4AF"];
   };
 
+  React.useEffect(() => {
+    // 1. SSR 빌드 에러 방지를 위한 브라우저 체크
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem('rp_step', step);
+      sessionStorage.setItem('rp_messages', JSON.stringify(messages));
+      sessionStorage.setItem('rp_customerType', customerType);
+      sessionStorage.setItem('rp_situation', situation);
+      sessionStorage.setItem('rp_selectedEpisode', JSON.stringify(selectedEpisode));
+      sessionStorage.setItem('rp_favorability', favorability);
+    }
+  }, [step, messages, customerType, situation, selectedEpisode, favorability]);
+
   const handleStart = async () => {
     if (!customerType || !situation) return alert('모두 선택해주세요!');
     const matches = episodes.filter(e => 
@@ -78,6 +90,11 @@ function RoleplayPanel({ episodes }) {
           try { setReportData(JSON.parse(jsonMatch[0])); } catch (e) { console.error(e); }
         }
         setMessages([...newMessages, { role: 'assistant', content: reply }]);
+        const turnsCompleted = [...newMessages, { role: 'assistant', content: reply }].filter(m => m.role === 'assistant').length;
+
+if (turnsCompleted >= MAX_TURNS) {
+  setStep('result');
+}
         setStep('result');
         return;
       }
@@ -106,16 +123,9 @@ function RoleplayPanel({ episodes }) {
     );
   }
 
-  React.useEffect(() => {
-    sessionStorage.setItem('rp_step', step);
-    sessionStorage.setItem('rp_messages', JSON.stringify(messages));
-    sessionStorage.setItem('rp_customerType', customerType);
-    sessionStorage.setItem('rp_situation', situation);
-    sessionStorage.setItem('rp_selectedEpisode', JSON.stringify(selectedEpisode));
-    sessionStorage.setItem('rp_favorability', favorability);
-  }, [step, messages, customerType, situation, selectedEpisode, favorability]);
 
-return (
+  
+  return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
       {/* 수정된 상단 영역 */}
       <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
@@ -130,6 +140,11 @@ return (
               <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">문제 상황</span>
               <span className="font-bold text-purple-950 text-sm">{situation}</span>
             </div>
+            <div className="flex items-center gap-3 mt-1">
+    <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">진행 턴</span>
+    <span className="font-bold text-purple-950 text-sm">
+      {messages.filter(m => m.role === 'assistant').length} / {MAX_TURNS}
+    </span>
           </div>
         </div>
    <button onClick={() => { 

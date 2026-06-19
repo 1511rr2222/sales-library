@@ -125,7 +125,7 @@ if (turnsCompleted >= MAX_TURNS) {
 
 
   
-  return (
+return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
       {/* 수정된 상단 영역 */}
       <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
@@ -141,20 +141,26 @@ if (turnsCompleted >= MAX_TURNS) {
               <span className="font-bold text-purple-950 text-sm">{situation}</span>
             </div>
             <div className="flex items-center gap-3 mt-1">
-    <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">진행 턴</span>
-    <span className="font-bold text-purple-950 text-sm">
-      {messages.filter(m => m.role === 'assistant').length} / {MAX_TURNS}
-    </span>
+              <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">진행 턴</span>
+              <span className="font-bold text-purple-950 text-sm">
+                {messages.filter(m => m.role === 'assistant').length} / {MAX_TURNS}
+              </span>
+            </div>
           </div>
         </div>
-   <button onClick={() => { 
-          sessionStorage.clear(); 
-          setStep('setup'); 
-          setMessages([]);         // 메시지 초기화
-          setFavorability(50);     // 호감도 초기화
-          setIsMistake(false);     // 실수 상태 초기화
-          setReportData(null);
-        }} className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white">종료</button>
+        <button 
+          onClick={() => { 
+            sessionStorage.clear(); 
+            setStep('setup'); 
+            setMessages([]); 
+            setFavorability(50); 
+            setIsMistake(false); 
+            setReportData(null);
+          }} 
+          className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white"
+        >
+          종료
+        </button>
       </div>
 
       {step === 'result' ? (
@@ -172,25 +178,22 @@ if (turnsCompleted >= MAX_TURNS) {
             {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">작성 중...</div>}
             {isMistake && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex justify-between items-center mx-4">
-    <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
-    <button 
-      onClick={() => {
-        // 선택된 에피소드 ID 확인
-        const id = selectedEpisode?.episode_id;
-        console.log("이동할 ID:", id); // 브라우저 콘솔에서 확인 가능
-        
-        if (id) {
-          navigate(`/episode/${id}`);
-        } else {
-          alert("에피소드 ID를 찾을 수 없습니다. 시트 데이터 형식을 확인하세요.");
-        }
-      }}
-      className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg"
-    >
-      우수 사례 보기
-    </button>
-  </div>
-)}
+                <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
+                <button 
+                  onClick={() => {
+                    const id = selectedEpisode?.episode_id;
+                    if (id) {
+                      navigate(`/episode/${id}`);
+                    } else {
+                      alert("에피소드 ID를 찾을 수 없습니다.");
+                    }
+                  }}
+                  className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg"
+                >
+                  우수 사례 보기
+                </button>
+              </div>
+            )}
           </div>
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">💡 힌트 보기</button>

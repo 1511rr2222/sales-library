@@ -134,6 +134,11 @@ function RoleplayPanel({ episodes }) {
     // ... (기존 setup UI 코드 생략 없이 유지하세요)
     const customerTypes = [...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02]).filter(Boolean))];
     const situations = [...new Set(episodes.filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType).flatMap(e => [e.문제상황_01, e.문제상황_02]).filter(Boolean))];
+    const filteredEpisodes = episodes.filter(e => 
+  (selectedCustomer === 'All' || e.고객유형_01 === selectedCustomer || e.고객유형_02 === selectedCustomer) &&
+  (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
+);
+
     return (
       <div className="p-6 bg-white rounded-2xl shadow-sm border-2 border-purple-200 max-w-xl mx-auto">
         <h2 className="text-2xl font-bold mb-6 text-purple-800">영업 롤플레잉 설정</h2>
@@ -152,8 +157,10 @@ function RoleplayPanel({ episodes }) {
     );
   }
 
+
+
   return (
-   <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[80vh] overflow-hidden"> 
+   <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col min-h-[600px] max-h-[85vh] overflow-hidden"> 
     <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
     <div className="flex items-center gap-4">
     <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
@@ -193,7 +200,7 @@ function RoleplayPanel({ episodes }) {
         </div>
       ) : (
         <>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-[300px]">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>{m.content}</div>

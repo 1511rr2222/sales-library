@@ -14,7 +14,7 @@ function MainPage() {
   const [view, setView] = useState('competency'); // 기본 탭
   const [loading, setLoading] = useState(true);
 
-const [selectedCustomer, setSelectedCustomer] = useState('All');
+  const [selectedCustomer, setSelectedCustomer] = useState('All');
   const [selectedSituation, setSelectedSituation] = useState('All');  
   const navigate = useNavigate();
 
@@ -71,10 +71,42 @@ const [selectedCustomer, setSelectedCustomer] = useState('All');
         {/* VIEW AREA */}
 <div className="relative min-h-[600px]">
   {/* COMPETENCY VIEW */}
-  <div className={`transition-all duration-300 ${view === 'competency' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
-    
-    {/* // [수정] 아래는 중복 삭제된 깔끔한 영역 루프입니다 */}
-    {areas.map(area => (
+// [MainPage.jsx] 내부 return 문 중 COMPETENCY VIEW 영역을 이렇게 수정하세요
+
+<div className={`transition-all duration-300 ${view === 'competency' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+  
+  <div className="flex gap-4 mb-8">
+    <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedCustomer(e.target.value)}>
+      <option value="All">고객 유형 전체</option>
+      {customerTypes.map(t => <option key={t} value={t}>{t}</option>)}
+    </select>
+    <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedSituation(e.target.value)}>
+      <option value="All">문제 상황 전체</option>
+      {situations.map(s => <option key={s} value={s}>{s}</option>)}
+    </select>
+  </div>
+
+  {/* // [수정] 필터가 선택되었는지 확인 (All이 아니면 필터링 모드) */}
+  {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (
+    <div className="mb-10">
+      <h3 className="font-bold text-lg mb-4 text-purple-800">검색된 에피소드</h3>
+      <div className="grid gap-3">
+        {episodes
+          .filter(e => 
+            (selectedCustomer === 'All' || e.고객유형_01 === selectedCustomer || e.고객유형_02 === selectedCustomer) &&
+            (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
+          )
+          .map(e => (
+            <div key={e.episode_id} onClick={() => navigate(`/episode/${e.episode_id}`)} className="p-4 bg-white border border-purple-100 rounded-xl shadow-sm hover:border-purple-300 cursor-pointer transition">
+              <p className="font-bold text-sm text-purple-950">{e.에피소드제목}</p>
+              <p className="text-xs text-gray-500 mt-1">{e.간단설명}</p>
+            </div>
+          ))}
+      </div>
+    </div>
+  ) : (
+    /* // [수정] 필터가 없을 때만 기존 역량 리스트를 보여줌 */
+    areas.map(area => (
       <div key={area.name} className="mb-10">
         <div className={`mb-4 border-l-4 ${area.color} pl-3`}>
           <h2 className="text-xl font-bold leading-tight">{area.name}</h2>
@@ -84,7 +116,6 @@ const [selectedCustomer, setSelectedCustomer] = useState('All');
           {competencies
             .filter(c => c.영역 === area.name)
             .map(competency => (
-              /* // [수정] 아래 카드 디자인을 원하시는 스타일로 교체했습니다 */
               <div
                 key={competency.competency_id}
                 onClick={() => navigate(`/skill/${competency.competency_id}`)}
@@ -99,9 +130,9 @@ const [selectedCustomer, setSelectedCustomer] = useState('All');
             ))}
         </div>
       </div>
-    ))}
-    {/* // [수정] 위에 있는 루프 하나면 충분하므로, 기존에 아래에 겹쳐있던 중복 코드들은 전부 지우시면 됩니다. */}
-  </div>
+    ))
+  )}
+</div>
 
   {/* ROLEPLAY VIEW */}
   {view === 'roleplay' && (

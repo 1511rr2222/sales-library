@@ -67,7 +67,10 @@ function RoleplayPanel({ episodes }) {
       const response = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatMessages })
+        body: JSON.stringify({ 
+          messages: chatMessages,
+          episode: selectedEpisode  
+         })
       });
       const data = await response.json();
       setReportData(data);
@@ -150,7 +153,7 @@ function RoleplayPanel({ episodes }) {
   }
 
   return (
-   <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]"> 
+   <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[80vh] overflow-hidden"> 
     <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
     <div className="flex items-center gap-4">
     <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
@@ -182,7 +185,11 @@ function RoleplayPanel({ episodes }) {
 
       {step === 'result' ? (
         <div className="flex-1 overflow-y-auto p-4 bg-purple-50/20">
-          {reportData ? <EvaluationReport reportData={reportData} /> : <div className="text-center p-10 text-purple-400">결과를 불러오는 중입니다...</div>}
+          {reportData ? 
+          <EvaluationReport reportData={reportData} /> 
+          : <div className="text-center p-10 text-purple-400">
+            <div className="animate-spin mb-4 inline-block w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full" />
+            결과를 불러오는 중입니다...</div>}
         </div>
       ) : (
         <>

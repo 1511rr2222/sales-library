@@ -71,8 +71,6 @@ function MainPage() {
         {/* VIEW AREA */}
 <div className="relative min-h-[600px]">
   {/* COMPETENCY VIEW */}
-// [MainPage.jsx] 내부 return 문 중 COMPETENCY VIEW 영역을 이렇게 수정하세요
-
 <div className={`transition-all duration-300 ${view === 'competency' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
   
   <div className="flex gap-4 mb-8">
@@ -124,7 +122,7 @@ function MainPage() {
                 <div className="text-4xl mb-4">{competency.아이콘}</div>
                 <div className="font-bold text-sm text-gray-900 mb-1.5">{competency.역량명}</div>
                 <p className="text-[11px] text-gray-500 leading-snug line-clamp-2">
-                  {competency.간단설명 || "역량 학습 페이지로 이동"}
+                  {competency.설명 || "역량 학습 페이지로 이동"}
                 </p>
               </div>
             ))}

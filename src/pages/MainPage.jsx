@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCompetencies, getEpisodes } from '../api';
@@ -7,12 +8,20 @@ import Footer from '../components/Footer';
 import RoleplayPanel from '../components/RoleplayPanel';
 
 function MainPage() {
+  const location = useLocation();
   const [competencies, setCompetencies] = useState([]);
   const [episodes, setEpisodes] = useState([]);
-  const [view, setView] = useState('competency');
+  const [view, setView] = useState('competency'); // 기본 탭
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // 롤플레잉 페이지에서 돌아왔을 때 탭 자동 전환
+    if (location.state?.from === 'roleplay') {
+      setView('roleplay');
+    }
+  }, [location]);
 
   useEffect(() => {
     Promise.all([

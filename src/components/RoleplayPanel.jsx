@@ -63,45 +63,60 @@ function RoleplayPanel({ episodes }) {
     } catch (error) { console.error(error); } finally { setIsLoading(false); }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    const newMessages = [...messages, { role: 'user', content: input }];
-    setMessages(newMessages);
-    setInput('');
-    setIsLoading(true);
-    try {
-      const systemPrompt = getSystemPrompt(customerType, situation, selectedEpisode);
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ systemPrompt, messages: newMessages })
-      });
-      const data = await response.json();
-      const reply = data.content[0].text;
-      const match = reply.match(/\[호감도: (\d+)\]/);
-      if (match) {
-        const newScore = parseInt(match[1]);
-        if (newScore < favorability) setIsMistake(true);
-        setFavorability(newScore);
-      }
-      if (reply.includes("[SESSION_END]")) {
+const handleSend = async () => {
+  if (!input.trim() || isLoading) return;
+  
+  const newMessages = [...messages, { role: 'user', content: input }];
+  setMessages(newMessages);
+  setInput('');
+  setIsLoading(true);
+
+  try {
+    const systemPrompt = getSystemPrompt(customerType, situation, selectedEpisode);
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemPrompt, messages: newMessages })
+    });
+    
+    const data = await response.json();
+    const reply = data.content[0].text;
+    
+    // 1. 호감도 파싱
+    const match = reply.match(/\[호감도: (\d+)\]/);
+    let currentFavorability = favorability;
+    if (match) {
+      currentFavorability = parseInt(match[1]);
+      if (currentFavorability < favorability) setIsMistake(true);
+      setFavorability(currentFavorability);
+    }
+
+    const updatedMessages = [...newMessages, { role: 'assistant', content: reply }];
+    setMessages(updatedMessages);
+
+    // 2. 종료 조건 체크 (턴 수 초과 OR 호감도 70 이상 OR 세션 종료 키워드)
+    const assistantTurns = updatedMessages.filter(m => m.role === 'assistant').length;
+    const isSessionEnd = reply.includes("[SESSION_END]");
+    
+    if (assistantTurns >= MAX_TURNS || currentFavorability >= 70 || isSessionEnd) {
+      setStep('result');
+      
+      // 3. 결과 데이터 파싱 (SESSION_END 키워드가 있을 경우만)
+      if (isSessionEnd) {
         const jsonMatch = reply.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          try { setReportData(JSON.parse(jsonMatch[0])); } catch (e) { console.error(e); }
+          try { setReportData(JSON.parse(jsonMatch[0])); } catch (e) { console.error("결과 파싱 에러:", e); }
         }
-        setMessages([...newMessages, { role: 'assistant', content: reply }]);
-        const turnsCompleted = [...newMessages, { role: 'assistant', content: reply }].filter(m => m.role === 'assistant').length;
-
-if (turnsCompleted >= MAX_TURNS) {
-  setStep('result');
-}
-        setStep('result');
-        return;
       }
-      setMessages([...newMessages, { role: 'assistant', content: reply }]);
-      if (newMessages.filter(m => m.role === 'user').length >= MAX_TURNS) setStep('result');
-    } catch (error) { console.error(error); } finally { setIsLoading(false); }
-  };
+      return; // 여기서 종료
+    }
+
+  } catch (error) {
+    console.error("챗봇 통신 에러:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleHint = () => setMessages(prev => [...prev, { role: 'assistant', content: "💡 [힌트] 고객의 고민을 먼저 경청하고, 공감하는 태도를 보여주세요." }]);
 
@@ -114,7 +129,9 @@ if (turnsCompleted >= MAX_TURNS) {
         <div className="mb-8 p-4 bg-purple-50 rounded-xl border border-purple-100 text-sm text-purple-700 leading-relaxed">
           <p className="font-bold mb-2">본 롤플레잉은 실제 내부 사례를 기반으로 제작되었습니다.</p>
           <p>당신은 영업사원이며 챗봇은 당신이 선택된 문제상황에 기반한 '고객'입니다.</p>
-          <p>고객의 마음을 사로잡아 호감도를 올리고 문제를 성공적으로 해결해보세요!</p>
+          <p>가능한 대화 턴은 10턴입니다. 10번의 대화 속에서 담당자의 호감도를 70이상 올려 거래를 성공하세요</p>
+          <p>대화가 막힐 경우 살제 우수 사례를 참고하거나 힌트를 적극 활용해보세요!</p>
+          <p>고객의 마음을 사로잡아 호감도를 올리고 문제를 성공적으로 해결하며 역량을 길러보세요.</p>
         </div>
         <select className="w-full mb-3 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setCustomerType(e.target.value)}><option value="">고객 유형 선택</option>{customerTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>
         <select className="w-full mb-6 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setSituation(e.target.value)}><option value="">문제 상황 선택</option>{situations.map((s, i) => <option key={i} value={s}>{s}</option>)}</select>

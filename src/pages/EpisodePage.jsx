@@ -55,7 +55,7 @@ function EpisodePage() {
 
         {location.state?.from === 'roleplay' && (
           <button 
-            onClick={() => navigate('/roleplay')} 
+onClick={() => navigate('/', { state: { from: 'roleplay' } })}
             className="mb-4 flex items-center text-sm font-bold text-gray-500 hover:text-gray-800"
           >
             &lt; 롤플레잉으로 돌아가기

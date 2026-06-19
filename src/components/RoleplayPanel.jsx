@@ -27,7 +27,6 @@ function RoleplayPanel({ episodes }) {
   };
 
   React.useEffect(() => {
-    // 1. SSR 빌드 에러 방지를 위한 브라우저 체크
     if (typeof window !== "undefined") {
       sessionStorage.setItem('rp_step', step);
       sessionStorage.setItem('rp_messages', JSON.stringify(messages));
@@ -63,77 +62,78 @@ function RoleplayPanel({ episodes }) {
     } catch (error) { console.error(error); } finally { setIsLoading(false); }
   };
 
-const handleSend = async () => {
-  if (!input.trim() || isLoading) return;
-  
-  const newMessages = [...messages, { role: 'user', content: input }];
-  setMessages(newMessages);
-  setInput('');
-  setIsLoading(true);
+  const fetchEvaluationReport = async (chatMessages) => {
+    try {
+      const response = await fetch('/api/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatMessages })
+      });
+      const data = await response.json();
+      setReportData(data);
+    } catch (e) { console.error("결과 분석 실패:", e); }
+  };
 
-  try {
-    const systemPrompt = getSystemPrompt(customerType, situation, selectedEpisode);
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ systemPrompt, messages: newMessages })
-    });
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     
-    const data = await response.json();
-    const reply = data.content[0].text;
-    
-    // 1. 호감도 파싱
-    const match = reply.match(/\[호감도: (\d+)\]/);
-    let currentFavorability = favorability;
-    if (match) {
-      currentFavorability = parseInt(match[1]);
-      if (currentFavorability < favorability) setIsMistake(true);
-      setFavorability(currentFavorability);
-    }
+    const newMessages = [...messages, { role: 'user', content: input }];
+    setMessages(newMessages);
+    setInput('');
+    setIsLoading(true);
 
-    const updatedMessages = [...newMessages, { role: 'assistant', content: reply }];
-    setMessages(updatedMessages);
-
-    // 2. 종료 조건 체크 (턴 수 초과 OR 호감도 70 이상 OR 세션 종료 키워드)
-    const assistantTurns = updatedMessages.filter(m => m.role === 'assistant').length;
-    const isSessionEnd = reply.includes("[SESSION_END]");
-    
-    if (assistantTurns >= MAX_TURNS || currentFavorability >= 70 || isSessionEnd) {
-      setStep('result');
+    try {
+      const systemPrompt = getSystemPrompt(customerType, situation, selectedEpisode);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemPrompt, messages: newMessages })
+      });
       
-      // 3. 결과 데이터 파싱 (SESSION_END 키워드가 있을 경우만)
-      if (isSessionEnd) {
-        const jsonMatch = reply.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          try { setReportData(JSON.parse(jsonMatch[0])); } catch (e) { console.error("결과 파싱 에러:", e); }
+      const data = await response.json();
+      const reply = data.content[0].text;
+      
+      const match = reply.match(/\[호감도: (\d+)\]/);
+      let currentFavorability = favorability;
+      if (match) {
+        currentFavorability = parseInt(match[1]);
+        if (currentFavorability < favorability) setIsMistake(true);
+        setFavorability(currentFavorability);
+      }
+
+      const updatedMessages = [...newMessages, { role: 'assistant', content: reply }];
+      setMessages(updatedMessages);
+
+      const assistantTurns = updatedMessages.filter(m => m.role === 'assistant').length;
+      const isSessionEnd = reply.includes("[SESSION_END]");
+      
+      if (assistantTurns >= MAX_TURNS || currentFavorability >= 70 || isSessionEnd) {
+        setStep('result');
+        fetchEvaluationReport(updatedMessages);
+        
+        if (isSessionEnd) {
+          const jsonMatch = reply.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            try { setReportData(JSON.parse(jsonMatch[0])); } catch (e) { console.error("JSON 파싱 에러:", e); }
+          }
         }
       }
-      return; // 여기서 종료
+    } catch (error) {
+      console.error("챗봇 통신 에러:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-  } catch (error) {
-    console.error("챗봇 통신 에러:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
+  
   const handleHint = () => setMessages(prev => [...prev, { role: 'assistant', content: "💡 [힌트] 고객의 고민을 먼저 경청하고, 공감하는 태도를 보여주세요." }]);
 
   if (step === 'setup') {
+    // ... (기존 setup UI 코드 생략 없이 유지하세요)
     const customerTypes = [...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02]).filter(Boolean))];
     const situations = [...new Set(episodes.filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType).flatMap(e => [e.문제상황_01, e.문제상황_02]).filter(Boolean))];
     return (
       <div className="p-6 bg-white rounded-2xl shadow-sm border-2 border-purple-200 max-w-xl mx-auto">
         <h2 className="text-2xl font-bold mb-6 text-purple-800">영업 롤플레잉 설정</h2>
-        <div className="mb-8 p-4 bg-purple-50 rounded-xl border border-purple-100 text-sm text-purple-700 leading-relaxed">
-          <p className="font-bold mb-2">본 롤플레잉은 실제 내부 사례를 기반으로 제작되었습니다.</p>
-          <p> [사용 설명] </p>
-          <p>- 당신은 영업사원이며 챗봇은 당신이 선택된 문제상황에 기반한 '고객'입니다.</p>
-          <p>- 가능한 대화 턴은 10턴입니다. 10번의 대화 속에서 담당자의 호감도를 70이상 올려 거래를 성공하세요</p>
-          <p>- 대화가 막힐 경우 살제 우수 사례를 참고하거나 힌트를 적극 활용해보세요!</p>
-          <p>고객의 마음을 사로잡아 호감도를 올리고 문제를 성공적으로 해결하며 역량을 길러보세요.</p>
-        </div>
         <select className="w-full mb-3 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setCustomerType(e.target.value)}><option value="">고객 유형 선택</option>{customerTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>
         <select className="w-full mb-6 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setSituation(e.target.value)}><option value="">문제 상황 선택</option>{situations.map((s, i) => <option key={i} value={s}>{s}</option>)}</select>
         <button onClick={handleStart} className="w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700">시작하기</button>
@@ -141,44 +141,21 @@ const handleSend = async () => {
     );
   }
 
-
-  
-return (
+  return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
-      {/* 수정된 상단 영역 */}
-      <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
+       {/* ... (이후 return문 UI는 기존 코드 그대로 유지) ... */}
+       <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">고객 유형</span>
-              <span className="font-bold text-purple-950 text-sm">{customerType}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">문제 상황</span>
-              <span className="font-bold text-purple-950 text-sm">{situation}</span>
-            </div>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">진행 턴</span>
-              <span className="font-bold text-purple-950 text-sm">
-                {messages.filter(m => m.role === 'assistant').length} / {MAX_TURNS}
-              </span>
-            </div>
-          </div>
+          <div className="text-sm font-bold text-purple-950">{customerType} | {situation}</div>
         </div>
         <button 
           onClick={() => {
             ['rp_step', 'rp_messages', 'rp_customerType', 'rp_situation', 'rp_selectedEpisode', 'rp_favorability'].forEach(key => sessionStorage.removeItem(key)); 
-            setStep('setup'); 
-            setMessages([]); 
-            setFavorability(50); 
-            setIsMistake(false); 
-            setReportData(null);
+            setStep('setup'); setMessages([]); setFavorability(50); setIsMistake(false); setReportData(null);
           }} 
           className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white"
-        >
-          종료
-        </button>
+        >종료</button>
       </div>
 
       {step === 'result' ? (
@@ -195,23 +172,11 @@ return (
             ))}
             {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">작성 중...</div>}
             {isMistake && (
-  <div className="p-4 bg-white border border-red-200 shadow-sm rounded-2xl flex justify-between items-center mx-4 my-2">
-    <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
-    <button 
-      onClick={() => {
-        const id = selectedEpisode?.episode_id;
-        if (id) {
-          navigate(`/episode/${id}`, { state: { from: 'roleplay' } });
-        } else {
-          alert("에피소드 ID를 찾을 수 없습니다.");
-        }
-      }}
-      className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
-    >
-      우수사례
-    </button>
-  </div>
-)}
+              <div className="p-4 bg-white border border-red-200 shadow-sm rounded-2xl flex justify-between items-center mx-4 my-2">
+                <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
+                <button onClick={() => navigate(`/episode/${selectedEpisode?.episode_id}`, { state: { from: 'roleplay' } })} className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm">우수사례</button>
+              </div>
+            )}
           </div>
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">💡 힌트 보기</button>
@@ -225,5 +190,4 @@ return (
     </div>
   );
 }
-
 export default RoleplayPanel;

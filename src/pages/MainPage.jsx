@@ -14,6 +14,8 @@ function MainPage() {
   const [view, setView] = useState('competency'); // 기본 탭
   const [loading, setLoading] = useState(true);
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterArea, setFilterArea] = useState('All');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +37,12 @@ function MainPage() {
     { name: 'Basic', subtitle: '단계별 영업 핵심 스킬', color: 'border-blue-500', light: 'bg-blue-50' },
     { name: 'Curator', subtitle: '고객 맞춤형 큐레이션 스킬', color: 'border-green-500', light: 'bg-green-50' },
   ];
+
+  const filteredCompetencies = competencies.filter(c => {
+    const matchesSearch = c.역량명.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesArea = filterArea === 'All' || c.영역 === filterArea;
+    return matchesSearch && matchesArea;
+  });
 
   if (loading) return <LoadingSpinner />;
 
@@ -65,16 +73,34 @@ function MainPage() {
         <div className="relative min-h-[600px]">
           {/* COMPETENCY VIEW */}
           <div className={`transition-all duration-300 ${view === 'competency' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+           <div className="flex gap-4 mb-8">
+              <input 
+                placeholder="역량 검색..." 
+                className="flex-1 p-3 rounded-xl border border-gray-200 text-sm"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <select className="p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setFilterArea(e.target.value)}>
+                <option value="All">전체 영역</option>
             {areas.map(area => (
+                  <option key={area.name} value={area.name}>
+                    {area.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {areas.filter(a => filterArea === 'All' || a.name === filterArea).map(area => (
               <div key={area.name} className="mb-10">
                 <div className={`mb-4 border-l-4 ${area.color} pl-3`}>
                   <h2 className="text-xl font-bold leading-tight">{area.name}</h2>
                   {area.subtitle && <p className="text-xs text-gray-400 mt-0.5">{area.subtitle}</p>}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {competencies
+                  {/* [수정: 전체 competencies 대신 위에서 계산한 filteredCompetencies 사용] */}
+                  {filteredCompetencies
                     .filter(c => c.영역 === area.name)
                     .map(competency => (
+                      
                       <div
                         key={competency.competency_id}
                         onClick={() => navigate(`/skill/${competency.competency_id}`)}

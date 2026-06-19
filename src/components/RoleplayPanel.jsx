@@ -142,21 +142,35 @@ function RoleplayPanel({ episodes }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
-       {/* ... (이후 return문 UI는 기존 코드 그대로 유지) ... */}
-       <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
-          <div className="text-sm font-bold text-purple-950">{customerType} | {situation}</div>
-        </div>
-        <button 
-          onClick={() => {
-            ['rp_step', 'rp_messages', 'rp_customerType', 'rp_situation', 'rp_selectedEpisode', 'rp_favorability'].forEach(key => sessionStorage.removeItem(key)); 
-            setStep('setup'); setMessages([]); setFavorability(50); setIsMistake(false); setReportData(null);
-          }} 
-          className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white"
-        >종료</button>
+   <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]"> 
+    <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
+    <div className="flex items-center gap-4">
+    <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">고객 유형</span>
+        <span className="font-bold text-purple-950 text-sm">{customerType}</span>
       </div>
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">문제 상황</span>
+        <span className="font-bold text-purple-950 text-sm">{situation}</span>
+      </div>
+      <div className="flex items-center gap-3 mt-1">
+        <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">진행 턴</span>
+        <span className="font-bold text-purple-950 text-sm">
+          {messages.filter(m => m.role === 'assistant').length} / {MAX_TURNS}
+        </span>
+      </div>
+    </div>
+  </div>
+  <button 
+    onClick={() => {
+      ['rp_step', 'rp_messages', 'rp_customerType', 'rp_situation', 'rp_selectedEpisode', 'rp_favorability'].forEach(key => sessionStorage.removeItem(key)); 
+      setStep('setup'); setMessages([]); setFavorability(50); setIsMistake(false); setReportData(null);
+    }} 
+    className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white"
+  >종료</button>
+</div>
 
       {step === 'result' ? (
         <div className="flex-1 overflow-y-auto p-4 bg-purple-50/20">

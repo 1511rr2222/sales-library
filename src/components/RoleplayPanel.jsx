@@ -93,7 +93,7 @@ function RoleplayPanel({ episodes, navigate }) {
         <h2 className="text-2xl font-bold mb-6 text-purple-800">영업 롤플레잉 설정</h2>
         <div className="mb-8 p-4 bg-purple-50 rounded-xl border border-purple-100 text-sm text-purple-700 leading-relaxed">
           <p className="font-bold mb-2">본 롤플레잉은 실제 내부 사례를 기반으로 제작되었습니다.</p>
-          <p>당신은 영업사원이며 챗봇은 당신이 선택한 상황에 기반한 '고객'으로 활동합니다!</p>
+          <p>당신은 영업사원이며 챗봇은 당신이 선택된 문제상황에 기반한 '고객'입니다.</p>
           <p>고객의 마음을 사로잡아 호감도를 올리고 문제를 성공적으로 해결해보세요!</p>
         </div>
         <select className="w-full mb-3 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setCustomerType(e.target.value)}><option value="">고객 유형 선택</option>{customerTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>
@@ -103,14 +103,21 @@ function RoleplayPanel({ episodes, navigate }) {
     );
   }
 
-  return (
+return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
+      {/* 수정된 상단 영역 */}
       <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-purple-600 uppercase">고객 유형</span>
-            <span className="font-extrabold text-purple-950 text-base">{customerType}</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">고객 유형</span>
+              <span className="font-bold text-purple-950 text-sm">{customerType}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-bold text-purple-600 uppercase bg-purple-100 px-1.5 py-0.5 rounded">문제 상황</span>
+              <span className="font-bold text-purple-950 text-sm">{situation}</span>
+            </div>
           </div>
         </div>
         <button onClick={() => setStep('setup')} className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white">종료</button>

@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function RoleplayPanel({ episodes }) {
   const navigate = useNavigate();
-  const [step, setStep] = useState('setup');
+  const [step, setStep] = useState(() => sessionStorage.getItem('rp_step') || 'setup');
   const [messages, setMessages] = useState(() => JSON.parse(sessionStorage.getItem('rp_messages')) || []);
   const [customerType, setCustomerType] = useState(() => sessionStorage.getItem('rp_customerType') || '');
   const [situation, setSituation] = useState(() => sessionStorage.getItem('rp_situation') || '');
@@ -128,9 +128,10 @@ const handleSend = async () => {
         <h2 className="text-2xl font-bold mb-6 text-purple-800">영업 롤플레잉 설정</h2>
         <div className="mb-8 p-4 bg-purple-50 rounded-xl border border-purple-100 text-sm text-purple-700 leading-relaxed">
           <p className="font-bold mb-2">본 롤플레잉은 실제 내부 사례를 기반으로 제작되었습니다.</p>
-          <p>당신은 영업사원이며 챗봇은 당신이 선택된 문제상황에 기반한 '고객'입니다.</p>
-          <p>가능한 대화 턴은 10턴입니다. 10번의 대화 속에서 담당자의 호감도를 70이상 올려 거래를 성공하세요</p>
-          <p>대화가 막힐 경우 살제 우수 사례를 참고하거나 힌트를 적극 활용해보세요!</p>
+          <p> [사용 설명] </p>
+          <p>- 당신은 영업사원이며 챗봇은 당신이 선택된 문제상황에 기반한 '고객'입니다.</p>
+          <p>- 가능한 대화 턴은 10턴입니다. 10번의 대화 속에서 담당자의 호감도를 70이상 올려 거래를 성공하세요</p>
+          <p>- 대화가 막힐 경우 살제 우수 사례를 참고하거나 힌트를 적극 활용해보세요!</p>
           <p>고객의 마음을 사로잡아 호감도를 올리고 문제를 성공적으로 해결하며 역량을 길러보세요.</p>
         </div>
         <select className="w-full mb-3 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setCustomerType(e.target.value)}><option value="">고객 유형 선택</option>{customerTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>

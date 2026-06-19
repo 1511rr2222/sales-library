@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';import Header from '../components/Header';
 import { getEpisodes, getMentors, getCompetencies } from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ChatBot from '../components/ChatBot';
@@ -11,6 +10,7 @@ import Avatar from 'boring-avatars';
 function EpisodePage() {
   const { episodeId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [episode, setEpisode] = useState(null);
   const [mentor, setMentor] = useState(null);
@@ -53,6 +53,15 @@ function EpisodePage() {
     <div className="min-h-screen bg-gray-50 px-4 py-4 md:p-8">
       <div className="max-w-3xl w-full mx-auto">
 
+        {location.state?.from === 'roleplay' && (
+          <button 
+            onClick={() => navigate(-1)} 
+            className="mb-4 flex items-center text-sm font-bold text-gray-500 hover:text-gray-800"
+          >
+            &lt; 롤플레잉으로 돌아가기
+          </button>
+        )}
+        
         <Header />
 
         <div className="bg-white rounded-2xl p-5 md:p-8 shadow-sm">

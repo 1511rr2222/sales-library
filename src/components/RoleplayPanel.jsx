@@ -18,7 +18,7 @@ function RoleplayPanel({ episodes }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isMistake, setIsMistake] = useState(false);
   const [reportData, setReportData] = useState(null);
-  const MAX_TURNS = 5;
+  const MAX_TURNS = 10;
 
   const getFavorabilityColors = (score) => {
     if (score >= 70) return ["#10B981", "#34D399", "#A7F3D0"];
@@ -183,13 +183,13 @@ return (
                   onClick={() => {
                     const id = selectedEpisode?.episode_id;
                     if (id) {
-                      navigate(`/episode/${id}`);
-                    } else {
-                      alert("에피소드 ID를 찾을 수 없습니다.");
-                    }
-                  }}
-                  className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg"
-                >
+                      navigate(`/episode/${id}`, { state: { from: 'roleplay' } });
+    } else {
+      alert("에피소드 ID를 찾을 수 없습니다.");
+    }
+  }}
+  className="..."
+>
                   우수 사례 보기
                 </button>
               </div>

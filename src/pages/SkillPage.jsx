@@ -69,12 +69,14 @@ function SkillPage() {
   };
 
 
-  const filteredEpisodes = episodes.filter(e =>
-    e.제목.includes(search) ||
-    e['상황(SITUATION)'].includes(search) ||
-    e['세일즈팁(SALES TIP)'].includes(search)
-  );
-
+  const filteredEpisodes = episodes.filter(e => {
+    const s = search.toLowerCase();
+    const title = e.제목.toLowerCase();
+    const situation = e['상황(SITUATION)'].toLowerCase();
+    const salesTip = e['세일즈팁(SALES TIP)'].toLowerCase();
+    return title.includes(s) || situation.includes(s) || salesTip.includes(s);
+});
+ 
 
   if (loading) {
     return <LoadingSpinner />;
@@ -195,7 +197,9 @@ function SkillPage() {
               focus:border-indigo-400
             "
           />
-
+<div className="text-sm text-gray-500 mb-4">
+  에피소드 개수 ({filteredEpisodes.length})
+</div>
 
 
           {/* EPISODES */}

@@ -148,7 +148,12 @@ function MainPage() {
   {/* ROLEPLAY VIEW */}
   {view === 'roleplay' && (
     <div className="transition-all duration-300 opacity-100">
-      <RoleplayPanel episodes={episodes} competencies={competencies} />
+      <RoleplayPanel 
+      episodes={episodes} 
+      competencies={competencies}
+      selectedCustomer={selectedCustomer}
+      selectedSituation={selectedSituation}
+       />
     </div>
   )}
 </div>

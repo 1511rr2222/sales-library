@@ -5,7 +5,7 @@ import { getSystemPrompt } from './prompts';
 import EvaluationReport from './EvaluationReport';
 import { useNavigate } from 'react-router-dom';
 
-function RoleplayPanel({ episodes }) {
+function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSituation }) {  
   const navigate = useNavigate();
   const [step, setStep] = useState(() => sessionStorage.getItem('rp_step') || 'setup');
   const [messages, setMessages] = useState(() => JSON.parse(sessionStorage.getItem('rp_messages')) || []);
@@ -134,10 +134,10 @@ function RoleplayPanel({ episodes }) {
     // ... (기존 setup UI 코드 생략 없이 유지하세요)
     const customerTypes = [...new Set(episodes.flatMap(e => [e.고객유형_01, e.고객유형_02]).filter(Boolean))];
     const situations = [...new Set(episodes.filter(e => e.고객유형_01 === customerType || e.고객유형_02 === customerType).flatMap(e => [e.문제상황_01, e.문제상황_02]).filter(Boolean))];
-    const filteredEpisodes = episodes.filter(e => 
-  (selectedCustomer === 'All' || e.고객유형_01 === selectedCustomer || e.고객유형_02 === selectedCustomer) &&
-  (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
-);
+const filteredEpisodes = episodes.filter(e => 
+      (selectedCustomer === 'All' || e.고객유형_01 === selectedCustomer || e.고객유형_02 === selectedCustomer) &&
+      (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
+    );
 
     return (
       <div className="p-6 bg-white rounded-2xl shadow-sm border-2 border-purple-200 max-w-xl mx-auto">
@@ -153,11 +153,21 @@ function RoleplayPanel({ episodes }) {
         <select className="w-full mb-3 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setCustomerType(e.target.value)}><option value="">고객 유형 선택</option>{customerTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>
         <select className="w-full mb-6 p-3 border-2 border-purple-200 rounded-lg" onChange={(e) => setSituation(e.target.value)}><option value="">문제 상황 선택</option>{situations.map((s, i) => <option key={i} value={s}>{s}</option>)}</select>
         <button onClick={handleStart} className="w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700">시작하기</button>
+{(selectedCustomer !== 'All' || selectedSituation !== 'All') && (
+          <div className="border-t pt-6">
+            <h3 className="font-bold text-purple-900 mb-4">추천 에피소드</h3>
+            <div className="grid gap-3">
+              {filteredEpisodes.map(e => (
+                <div key={e.episode_id} className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                  <p className="font-bold text-sm text-purple-900">{e.제목}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
-
-
 
   return (
    <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col min-h-[600px] max-h-[85vh] overflow-hidden"> 

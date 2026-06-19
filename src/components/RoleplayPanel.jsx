@@ -8,13 +8,14 @@ import { useNavigate } from 'react-router-dom';
 function RoleplayPanel({ episodes }) {
   const navigate = useNavigate();
   const [step, setStep] = useState('setup');
-  const [customerType, setCustomerType] = useState('');
-  const [situation, setSituation] = useState('');
-  const [selectedEpisode, setSelectedEpisode] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => JSON.parse(sessionStorage.getItem('rp_messages')) || []);
+  const [customerType, setCustomerType] = useState(() => sessionStorage.getItem('rp_customerType') || '');
+  const [situation, setSituation] = useState(() => sessionStorage.getItem('rp_situation') || '');
+  const [selectedEpisode, setSelectedEpisode] = useState(() => JSON.parse(sessionStorage.getItem('rp_selectedEpisode')) || null);
+  const [favorability, setFavorability] = useState(() => parseInt(sessionStorage.getItem('rp_favorability')) || 50);
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [favorability, setFavorability] = useState(50);
   const [isMistake, setIsMistake] = useState(false);
   const [reportData, setReportData] = useState(null);
   const MAX_TURNS = 5;
@@ -105,6 +106,15 @@ function RoleplayPanel({ episodes }) {
     );
   }
 
+  React.useEffect(() => {
+    sessionStorage.setItem('rp_step', step);
+    sessionStorage.setItem('rp_messages', JSON.stringify(messages));
+    sessionStorage.setItem('rp_customerType', customerType);
+    sessionStorage.setItem('rp_situation', situation);
+    sessionStorage.setItem('rp_selectedEpisode', JSON.stringify(selectedEpisode));
+    sessionStorage.setItem('rp_favorability', favorability);
+  }, [step, messages, customerType, situation, selectedEpisode, favorability]);
+
 return (
     <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col h-[650px]">
       {/* 수정된 상단 영역 */}
@@ -122,7 +132,14 @@ return (
             </div>
           </div>
         </div>
-        <button onClick={() => setStep('setup')} className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white">종료</button>
+   <button onClick={() => { 
+          sessionStorage.clear(); 
+          setStep('setup'); 
+          setMessages([]);         // 메시지 초기화
+          setFavorability(50);     // 호감도 초기화
+          setIsMistake(false);     // 실수 상태 초기화
+          setReportData(null);
+        }} className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white">종료</button>
       </div>
 
       {step === 'result' ? (

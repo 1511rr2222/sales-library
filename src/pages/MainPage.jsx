@@ -11,7 +11,7 @@ function MainPage() {
   const location = useLocation();
   const [competencies, setCompetencies] = useState([]);
   const [episodes, setEpisodes] = useState([]);
-  const [view, setView] = useState('competency'); // 기본 탭
+  const [view, setView] = useState('competency');   
   const [loading, setLoading] = useState(true);
 
   const [selectedCustomer, setSelectedCustomer] = useState('All');
@@ -60,8 +60,8 @@ function MainPage() {
         <div className="mt-6 mb-8">
           <div className="relative inline-flex w-52 bg-gray-200 rounded-full p-1">
             <div
-              className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
-                view === 'roleplay' ? 'translate-x-full' : 'translate-x-0'
+            className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
+            view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0'
               }`}
             />
             <button onClick={() => setView('competency')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'competency' ? 'text-gray-800' : 'text-gray-500'}`}>
@@ -69,6 +69,9 @@ function MainPage() {
             </button>
             <button onClick={() => setView('roleplay')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'roleplay' ? 'text-gray-800' : 'text-gray-500'}`}>
               롤플레잉
+            </button>
+            <button onClick={() => setView('allEpisodes')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'allEpisodes' ? 'text-gray-800' : 'text-gray-500'}`}>
+              전체 에피소드
             </button>
           </div>
         </div>

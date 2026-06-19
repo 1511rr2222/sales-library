@@ -112,22 +112,34 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       
       if (assistantTurns >= MAX_TURNS || currentFavorability >= 70 || isSessionEnd) {
         setStep('result');
-        fetchEvaluationReport(updatedMessages);
+        setIsAnalyzing(true);
         
-        if (isSessionEnd) {
-          const jsonMatch = reply.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            try { setReportData(JSON.parse(jsonMatch[0])); } catch (e) { console.error("JSON 파싱 에러:", e); }
-          }
-        }
-      }
+        try {
+    // 1. 평가 보고서 데이터 가져오기 (await 추가)
+    const report = await fetchEvaluationReport(updatedMessages); 
+    
+    // 2. 결과 데이터 저장 (fetchEvaluationReport가 데이터를 반환한다고 가정)
+    if (report) {
+      setReportData(report);
+    } else if (isSessionEnd) {
+      // API 실패 시 챗봇이 보낸 JSON이라도 파싱 시도
+      const jsonMatch = reply.match(/\{[\s\S]*\}/);
+      if (jsonMatch) setReportData(JSON.parse(jsonMatch[0]));
+    }
     } catch (error) {
       console.error("챗봇 통신 에러:", error);
     } finally {
       setIsLoading(false);
     }
+  }
+  }
+   catch (error) {
+      console.error("전체 프로세스 에러:", error);
+    } finally {
+      setIsLoading(false); // [이동] 여기서 전체 로딩을 종료합니다.
+    }
   };
-  
+
   const handleHint = () => setMessages(prev => [...prev, { role: 'assistant', content: "💡 [힌트] 고객의 고민을 먼저 경청하고, 공감하는 태도를 보여주세요." }]);
 
   if (step === 'setup') {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';import Header from '../components/Header';
+import Header from '../components/Header';
 import { getEpisodes, getMentors, getCompetencies } from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ChatBot from '../components/ChatBot';
@@ -16,6 +17,7 @@ function EpisodePage() {
   const [mentor, setMentor] = useState(null);
   const [competencies, setCompetencies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalEpisodes, setTotalEpisodes] = useState(0);
 
   const getColor = (name) => {
     if (['디지털 리터러시', '전략적 커뮤니케이션', '자기주도적 성과관리', '프로페셔널 매너'].includes(name))
@@ -31,6 +33,7 @@ function EpisodePage() {
     setLoading(true); // 로딩 시작 명시
     Promise.all([
       getEpisodes().then(data => {
+        setTotalEpisodes(data.length);
         const found = data.find(e => String(e.episode_id) === String(episodeId));
 
         if (found) {
@@ -52,6 +55,10 @@ function EpisodePage() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-4 md:p-8">
       <div className="max-w-3xl w-full mx-auto">
+
+        <div className="mb-4 text-xs font-medium text-gray-400">
+          총 {totalEpisodes}개의 에피소드 중 현재 페이지
+        </div>
 
         {location.state?.from === 'roleplay' && (
           <button 

@@ -167,8 +167,8 @@ return (
           </div>
         </div>
         <button 
-          onClick={() => { 
-            sessionStorage.clear(); 
+          onClick={() => {
+            ['rp_step', 'rp_messages', 'rp_customerType', 'rp_situation', 'rp_selectedEpisode', 'rp_favorability'].forEach(key => sessionStorage.removeItem(key)); 
             setStep('setup'); 
             setMessages([]); 
             setFavorability(50); 

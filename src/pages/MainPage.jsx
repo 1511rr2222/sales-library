@@ -58,7 +58,7 @@ function MainPage() {
 
         {/* SWITCH */}
         <div className="mt-6 mb-8">
-          <div className="relative inline-flex w-52 bg-gray-200 rounded-full p-1">
+          <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
             <div
             className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
             view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0'
@@ -78,6 +78,21 @@ function MainPage() {
 
         {/* VIEW AREA */}
 <div className="relative min-h-[600px]">
+<div className={`transition-all duration-300 ${view === 'allEpisodes' ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'}`}>
+    <h3 className="font-bold text-lg mb-4 text-blue-800">모든 에피소드 ({episodes.length}건)</h3>
+    <div className="grid gap-3">
+      {episodes.map(e => (
+        <div 
+          key={e.episode_id} 
+          onClick={() => navigate(`/episode/${e.episode_id}`)}
+          className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition-all border-l-4 border-l-blue-400"
+        >
+          <p className="font-bold text-base text-gray-900">{e.제목}</p>
+          <p className="text-xs text-gray-500 mt-2 line-clamp-2">{e.개요 || "상세 설명이 없습니다."}</p>
+        </div>
+      ))}
+    </div>
+  </div>
   {/* COMPETENCY VIEW */}
 <div className={`transition-all duration-300 ${view === 'competency' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
   

@@ -39,9 +39,6 @@ function Header() {
         </>
       ) : (
         <div className="w-full">
-          {/* // [수정] 로고 추가 */}
-          <img src="/logo.png" alt="Company Logo" className="h-12 w-auto mb-4" />
-          {/* // [수정] 아래 h1부터 설명 박스까지가 기존 코드 그대로 복구되어야 합니다 */}
           <h1
             className="text-5xl md:text-6xl font-normal tracking-tight leading-tight mb-4"
             style={{ fontFamily: "'DM Serif Display', serif" }}
@@ -81,8 +78,12 @@ function Header() {
     </button>
   );
 
-  return (
-    <>
+return (
+    // [수정] 모든 요소가 이 div 안에 들어가야 합니다
+    <div className="relative w-full">
+      {/* 로고를 div 안쪽으로 배치 */}
+      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-8 w-auto opacity-80" />
+      
       {/* PC HEADER */}
       <div className="hidden md:block py-6 mb-6 border-b border-gray-200">
         <div className="flex items-start gap-3">
@@ -98,10 +99,9 @@ function Header() {
         <div className="absolute left-3">
           <BackButton />
         </div>
-
         <Title isMobile />
       </div>
-    </>
+    </div>
   );
 }
 

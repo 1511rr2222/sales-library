@@ -74,8 +74,11 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
          })
       });
       const data = await response.json();
-      setReportData(data);
-    } catch (e) { console.error("결과 분석 실패:", e); }
+      return data;
+    } catch (e) { 
+      console.error("결과 분석 실패:", e); 
+      return null;
+    }
   };
 
   const handleSend = async () => {
@@ -130,6 +133,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     } catch (error) {
       console.error("챗봇 통신 에러:", error);
     } finally {
+      setIsLoading(false);
       setIsLoading(false);
     }
   }

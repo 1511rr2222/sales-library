@@ -239,10 +239,11 @@ const filteredEpisodes = episodes.filter(e =>
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">
               💡 힌트 보기</button>
+             {(messages.filter(m => m.role === 'assistant').length >= 10 || favorability >= 70 || favorability <= 20) && ( 
             <button 
-    onClick={async () => {
-      setStep('report'); // 화면을 리포트 모드로 변경
-      try {
+          onClick={async () => {
+          setStep('report'); // 화면을 리포트 모드로 변경
+          try {
         const response = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -252,13 +253,14 @@ const filteredEpisodes = episodes.filter(e =>
         setReportData(result); // 데이터를 저장하면 EvaluationReport가 뜹니다.
       } catch (error) {
         console.error("평가 실패:", error);
+        setStep('roleplay'); 
       }
     }}
     className="w-full mb-4 py-2 text-xs font-bold text-white bg-green-600 rounded-xl hover:bg-green-700"
   >
     📊 평가 결과 확인하기
   </button>
-            
+    )}         
             <div className="flex gap-2">
               <input value={input} disabled={isLoading} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} className="flex-1 border-2 border-purple-100 rounded-xl px-4 py-2" placeholder="메시지 입력..." />
               <button onClick={handleSend} className="bg-purple-600 text-white p-3 rounded-xl"><Send size={18} /></button>

@@ -252,9 +252,10 @@ const filteredEpisodes = episodes.filter(e =>
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ messages, episode: situation })
         });
+        const text = await response.text();
         console.log("서버 응답:", response);
 
-        const result = await response.json();
+        const result = JSON.parse(text);
         setReportData(result); // 데이터를 저장하면 EvaluationReport가 뜹니다.
       } catch (error) {
         console.error("평가 실패:", error);

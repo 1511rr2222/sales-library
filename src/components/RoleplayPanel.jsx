@@ -65,9 +65,9 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
 
   const fetchEvaluationReport = async (chatMessages) => {
     try {
-      const response = await fetch('/api/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           messages: chatMessages,
           episode: selectedEpisode  
@@ -242,6 +242,8 @@ const filteredEpisodes = episodes.filter(e =>
              {(messages.filter(m => m.role === 'assistant').length >= 10 || favorability >= 70 || favorability <= 20) && ( 
             <button 
           onClick={async () => {
+            console.log("평가 버튼이 클릭되었습니다!");
+          
           setStep('report'); // 화면을 리포트 모드로 변경
           try {
         const response = await fetch('/api/evaluate', {
@@ -249,6 +251,8 @@ const filteredEpisodes = episodes.filter(e =>
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ messages, episode: situation })
         });
+        console.log("서버 응답:", response);
+
         const result = await response.json();
         setReportData(result); // 데이터를 저장하면 EvaluationReport가 뜹니다.
       } catch (error) {

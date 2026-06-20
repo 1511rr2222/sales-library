@@ -76,7 +76,9 @@ function MainPage() {
     </div>
     
       {/* PAGE CONTAINER */}
-      <div className="max-w-4xl w-full mx-auto flex-1 px-4 py-4 md:p-8">
+      <div className="flex-1 flex flex-col min-h-screen">
+      </div>
+      <div className="flex-1 max-w-4xl w-full mx-auto flex-1 px-4 py-4 md:p-8">
         <Header />
 
         {/* SWITCH */}
@@ -131,10 +133,12 @@ function MainPage() {
   </div>
 
   {/* ABOUT PAGE VIEW */} 
-  <div className={`transition-all duration-300 ${view === 'about' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+  <div className={`transition-all duration-300 $
+    {view === 'AboutPage' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
     <AboutPage /> </div>
   {/* COMPETENCY INFO VIEW */}
-  <div className={`transition-all duration-300 ${view === 'info' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+  <div className={`transition-all duration-300 $
+    {view === 'CompetencyInfo' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
   <CompetencyInfo /></div>
 
 
@@ -206,8 +210,8 @@ function MainPage() {
     </div>
   )}
 </div>
-      </div>
       <Footer />
+      </div>
     </div>
   );
 }

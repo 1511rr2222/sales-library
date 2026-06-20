@@ -56,7 +56,7 @@ function MainPage() {
   return (
 <div className="flex min-h-screen bg-gray-50">
     {/* 좌측 패널 (사이드바) */}
-    <div className={`transition-all duration-300 bg-white border-r h-screen flex flex-col ${isSidebarOpen ? 'w-64' : 'w-16'}`}>
+    <div className={`transition-all duration-300 bg-white border-r h-screen flex flex-col ${isSidebarOpen ? 'w-40' : 'w-16'}`}>
       <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-4 w-full">
         <div className="space-y-1.5 flex flex-col items-center">
           <div className="w-6 h-0.5 bg-gray-600"></div>
@@ -73,10 +73,6 @@ function MainPage() {
         </nav>
       )}
 
-      {/* 로고 영역 (사이드바 하단에 항상 고정) */}
-      <div className="mt-auto p-4 border-t flex flex-col items-center justify-center">
-        <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-      </div>
     </div>
     
       {/* PAGE CONTAINER */}

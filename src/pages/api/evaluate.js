@@ -167,11 +167,14 @@ ${conversationText}
       });
     }
 
+    let cleanText = modelText.trim();
+    cleanText = cleanText.replace(/```json/g, '').replace(/```/g, '');
+
     let parsedReport;
     try {
-      parsedReport = JSON.parse(modelText);
+      parsedReport = JSON.parse(cleanText);
     } catch (parseError) {
-      console.error('최종 리포트 JSON 파싱 실패:', modelText);
+      console.error('최종 리포트 JSON 파싱 실패:', cleanText);
       return res.status(500).json({
         error: '평가 결과 JSON 파싱 실패',
         raw: modelText

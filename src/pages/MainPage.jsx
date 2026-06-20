@@ -6,8 +6,11 @@ import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Footer from '../components/Footer';
 import RoleplayPanel from '../components/RoleplayPanel';
+import AboutPage from '../components/AboutPage';
+import CompetencyInfo from '../components/CompetencyInfo';
 
 function MainPage() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);  
   const location = useLocation();
   const [competencies, setCompetencies] = useState([]);
   const [episodes, setEpisodes] = useState([]);
@@ -51,7 +54,31 @@ function MainPage() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+<div className="flex min-h-screen bg-gray-50">
+    {/* 좌측 패널 (사이드바) */}
+    <div className={`transition-all duration-300 bg-white border-r h-screen flex flex-col ${isSidebarOpen ? 'w-64' : 'w-16'}`}>
+      <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-4 w-full">
+        <div className="space-y-1.5 flex flex-col items-center">
+          <div className="w-6 h-0.5 bg-gray-600"></div>
+          <div className="w-6 h-0.5 bg-gray-600"></div>
+          <div className="w-6 h-0.5 bg-gray-600"></div>
+        </div>
+      </button>
+
+      {/* 펼쳐졌을 때만 보이는 메뉴 */}
+      {isSidebarOpen && (
+        <nav className="flex-1 mt-4 px-2">
+          <button onClick={() => setView('AboutPage')} className="block w-full text-left p-3 hover:bg-gray-100 rounded">Sales Library 설명</button>
+          <button onClick={() => setView('CompetencyInfo')} className="block w-full text-left p-3 hover:bg-gray-100 rounded">역량별 설명</button>
+        </nav>
+      )}
+
+      {/* 로고 영역 (사이드바 하단에 항상 고정) */}
+      <div className="mt-auto p-4 border-t flex flex-col items-center justify-center">
+        <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+      </div>
+    </div>
+    
       {/* PAGE CONTAINER */}
       <div className="max-w-4xl w-full mx-auto flex-1 px-4 py-4 md:p-8">
         <Header />
@@ -106,6 +133,14 @@ function MainPage() {
       {situations.map(s => <option key={s} value={s}>{s}</option>)}
     </select>
   </div>
+
+  {/* ABOUT PAGE VIEW */} 
+  <div className={`transition-all duration-300 ${view === 'about' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+    <AboutPage /> </div>
+  {/* COMPETENCY INFO VIEW */}
+  <div className={`transition-all duration-300 ${view === 'info' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+  <CompetencyInfo /></div>
+
 
   {/* // [수정] 필터가 선택되었는지 확인 (All이 아니면 필터링 모드) */}
   {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (

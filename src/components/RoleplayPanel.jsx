@@ -81,7 +81,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     }
   };
 
-  const handleSend = async () => {
+const handleSend = async () => {
     if (!input.trim() || isLoading) return;
     
     const newMessages = [...messages, { role: 'user', content: input }];
@@ -100,6 +100,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       const data = await response.json();
       const reply = data.content[0].text;
       
+      // 호감도 처리
       const match = reply.match(/\[호감도: (\d+)\]/);
       let currentFavorability = favorability;
       if (match) {
@@ -111,37 +112,31 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       const updatedMessages = [...newMessages, { role: 'assistant', content: reply }];
       setMessages(updatedMessages);
 
+      // 종료 조건 계산
       const assistantTurns = updatedMessages.filter(m => m.role === 'assistant').length;
       const isSessionEnd = reply.includes("[SESSION_END]");
-      
-      if (assistantTurns >= MAX_TURNS || currentFavorability >= 70 || isSessionEnd) {
-        setStep('result');
+      const isMaxTurns = assistantTurns >= MAX_TURNS;
+      const isSuccess = currentFavorability >= 70;
+
+      // [핵심] 종료 조건일 때만 리포트 생성
+      if (isMaxTurns || isSuccess || isSessionEnd) {
+        setStep('report'); // 화면 전환
         setIsAnalyzing(true);
         
         try {
-    // 1. 평가 보고서 데이터 가져오기 (await 추가)
-    const report = await fetchEvaluationReport(updatedMessages); 
-    
-    // 2. 결과 데이터 저장 (fetchEvaluationReport가 데이터를 반환한다고 가정)
-    if (report) {
-      setReportData(report);
-    } else if (isSessionEnd) {
-      // API 실패 시 챗봇이 보낸 JSON이라도 파싱 시도
-      const jsonMatch = reply.match(/\{[\s\S]*\}/);
-      if (jsonMatch) setReportData(JSON.parse(jsonMatch[0]));
-    }
+          const report = await fetchEvaluationReport(updatedMessages);
+          setReportData(report || { error: "분석 실패" });
+        } catch (error) {
+          console.error("평가 API 호출 에러:", error);
+        } finally {
+          setIsAnalyzing(false);
+        }
+      }
+
     } catch (error) {
       console.error("챗봇 통신 에러:", error);
     } finally {
-      setIsLoading(false);
-      setIsLoading(false);
-    }
-  }
-  }
-   catch (error) {
-      console.error("전체 프로세스 에러:", error);
-    } finally {
-      setIsLoading(false); // [이동] 여기서 전체 로딩을 종료합니다.
+      setIsLoading(false); // 전체 로딩 종료
     }
   };
 
@@ -217,7 +212,7 @@ const filteredEpisodes = episodes.filter(e =>
   >종료</button>
 </div>
 
-      {step === 'result' ? (
+      {step === 'report' ? (
         <div className="flex-1 overflow-y-auto p-4 bg-purple-50/20">
           {reportData ? 
           <EvaluationReport reportData={reportData} /> 

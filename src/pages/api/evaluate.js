@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  console.log("요청 메서드 확인:", req.method);
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -170,6 +171,8 @@ ${conversationText}
     let cleanText = modelText.trim();
     cleanText = cleanText.replace(/```json/g, '').replace(/```/g, '');
 
+  // ... (Claude API 호출 및 파싱 부분은 유지)
+
     let parsedReport;
     try {
       parsedReport = JSON.parse(cleanText);
@@ -181,42 +184,15 @@ ${conversationText}
       });
     }
 
-    const normalizedReport = {
-      scores: {
-        '신뢰/관계': Number(parsedReport?.scores?.['신뢰/관계'] ?? 30),
-        '니즈 파악': Number(parsedReport?.scores?.['니즈 파악'] ?? 30),
-        '솔루션 제안': Number(parsedReport?.scores?.['솔루션 제안'] ?? 30),
-        '매너': Number(parsedReport?.scores?.['매너'] ?? 30)
-      },
-      핵심노하우: Array.isArray(parsedReport?.핵심노하우)
-        ? parsedReport.핵심노하우
-        : ['고객의 반응을 보며 대화를 조율하는 연습이 필요합니다.'],
-      주의점: Array.isArray(parsedReport?.주의점)
-        ? parsedReport.주의점
-        : ['고객의 니즈를 더 구체적으로 확인하는 질문을 보강해보세요.'],
-    };
+    // [수정 핵심] 고정 데이터를 쓰지 말고, Claude가 준 parsedReport를 그대로 반환합니다!
+    return res.status(200).json(parsedReport);
 
-    return res.status(200).json(normalizedReport);
-  } catch (error) {
+  } catch (error) { 
+    // 이 catch는 전체를 감싸는 가장 큰 try의 catch여야 합니다.
     console.error('evaluate API 전체 오류:', error);
-
     return res.status(500).json({
-      scores: {
-        '신뢰/관계': 40,
-        '니즈 파악': 40,
-        '솔루션 제안': 40,
-        '매너': 50
-      },
-      핵심노하우: [
-        '대화는 이어졌지만 분석 중 오류가 발생했습니다.',
-        '기본적인 예의와 응대 흐름은 유지하는 것이 중요합니다.',
-        '고객 질문과 공감 표현을 더 늘리면 평가 정확도가 높아집니다.'
-      ],
-      주의점: [
-        '서버에서 평가 결과 생성 중 문제가 발생했습니다.',
-        '환경변수와 API 라우트 경로를 다시 확인해보세요.',
-        '대화 메시지 형식이 올바른지도 함께 점검해보세요.'
-      ],
-        });
+      error: "서버 처리 중 오류 발생",
+      details: error.message
+    });
   }
 }

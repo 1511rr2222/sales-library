@@ -214,6 +214,7 @@ const filteredEpisodes = episodes.filter(e =>
 
       {step === 'report' ? (
         <div className="flex-1 overflow-y-auto p-4 bg-purple-50/20">
+          
           {reportData ? 
           <EvaluationReport reportData={reportData} /> 
           : <div className="text-center p-10 text-purple-400">

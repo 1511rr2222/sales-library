@@ -1,31 +1,23 @@
 export default async function handler(req, res) {
-  console.log("요청 메서드 확인:", req.method);
+  // 1. 메서드 체크
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // 2. 전체 비즈니스 로직
   try {
     const { messages, episode } = req.body || {};
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({
-        error: 'messages가 비어있거나 올바른 형식이 아닙니다.'
-      });
+      return res.status(400).json({ error: 'messages가 올바르지 않습니다.' });
     }
 
     const conversationText = messages
       .filter((msg) => msg && msg.content)
-      .map((msg) => {
-        const speaker = msg.role === 'user' ? '영업사원' : '고객';
-        return `${speaker}: ${msg.content}`;
-      })
+      .map((msg) => `${msg.role === 'user' ? '영업사원' : '고객'}: ${msg.content}`)
       .join('\n');
 
-    const episodeText = episode
-      ? typeof episode === 'string'
-        ? episode
-        : JSON.stringify(episode, null, 2)
-      : '정보 없음';
+    const episodeText = episode ? (typeof episode === 'string' ? episode : JSON.stringify(episode, null, 2)) : '정보 없음';
 
     const prompt = `
 당신은 영업 코칭 및 롤플레잉 평가 전문가입니다.

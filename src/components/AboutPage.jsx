@@ -7,9 +7,8 @@ export function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white">
 
-      {/* soloprofile 크게 위에 */}
       <div className="flex justify-center mb-4">
-        <img src={soloProfile} alt="솔로 프로필" className="w-40 h-40 object-contain" />
+        <img src={soloProfile} alt="솔로 프로필" className="w-72 h-60 object-contain" />
       </div>
 
       {/* 파란 카드 */}

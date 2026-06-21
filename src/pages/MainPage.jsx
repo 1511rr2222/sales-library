@@ -34,7 +34,6 @@ function MainPage() {
   };
 
   useEffect(() => {
-    // 롤플레잉 페이지에서 돌아왔을 때 탭 자동 전환
     if (location.state?.from === 'roleplay') {
       setView('roleplay');
     }
@@ -62,15 +61,28 @@ function MainPage() {
     (selectedSituation === 'All' || e.문제상황_01 === selectedSituation || e.문제상황_02 === selectedSituation)
   );
 
-  const filteredCompetencies = competencies;
-
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* 좌측 패널 (사이드바) */}
-      <div className={`transition-all duration-300 bg-white border-r h-screen flex flex-col ${isSidebarOpen ? 'w-48' : 'w-16'}`}>
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-4 w-full">
+
+      {/* ✅ 수정: 모바일에서 사이드바 열렸을 때 dimmed backdrop - 클릭 시 닫힘 */}
+      {isSidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/30 z-30"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* ✅ 수정: 모바일에서 fixed overlay, 데스크탑에서 기존 방식 유지 */}
+      <div className={`
+        fixed md:relative z-40
+        transition-all duration-300
+        bg-white border-r h-screen flex flex-col
+        ${isSidebarOpen ? 'w-48' : 'w-0 md:w-16 overflow-hidden'}
+      `}>
+        {/* 데스크탑 전용 햄버거 버튼 */}
+        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="hidden md:block p-4 w-full">
           <div className="space-y-1.5 flex flex-col items-center">
             <div className="w-6 h-0.5 bg-gray-600"></div>
             <div className="w-6 h-0.5 bg-gray-600"></div>
@@ -79,14 +91,27 @@ function MainPage() {
         </button>
         {isSidebarOpen && (
           <nav className="flex-1 mt-4 px-2">
-            <button onClick={() => setView('AboutPage')} className="block w-full text-left p-3 hover:bg-gray-100 rounded">Sales Library 설명</button>
-            <button onClick={() => setView('CompetencyInfo')} className="block w-full text-left p-3 hover:bg-gray-100 rounded">역량별 설명</button>
+            <button onClick={() => { setView('AboutPage'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">Sales Library 설명</button>
+            <button onClick={() => { setView('CompetencyInfo'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">역량별 설명</button>
           </nav>
         )}
       </div>
 
       {/* PAGE CONTAINER */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      {/* ✅ 수정: 모바일에서 전체 너비 사용 (사이드바가 fixed라 공간 차지 안 함) */}
+      <div className="flex-1 flex flex-col min-h-screen w-full">
+        {/* ✅ 수정: 모바일 전용 햄버거 버튼 - 헤더 왼쪽에 고정 */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-sm"
+        >
+          <div className="space-y-1.5 flex flex-col items-center">
+            <div className="w-5 h-0.5 bg-gray-600"></div>
+            <div className="w-5 h-0.5 bg-gray-600"></div>
+            <div className="w-5 h-0.5 bg-gray-600"></div>
+          </div>
+        </button>
+
         <div className="py-3 md:py-5">
           <Header />
         </div>
@@ -119,11 +144,9 @@ function MainPage() {
                   const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
                   return (
                     <div key={episode.episode_id} className="bg-gray-50 rounded-lg p-3 border border-gray-300">
-                      {/* 제목 */}
                       <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">
                         {episode.제목}
                       </h1>
-                      {/* 역량 태그 */}
                       <div className="flex flex-wrap gap-1 mb-2">
                         {[
                           episode.competency_id_1,
@@ -177,7 +200,6 @@ function MainPage() {
                 </select>
               </div>
 
-              {/* [수정] 필터가 선택되었는지 확인 (All이 아니면 필터링 모드) */}
               {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (
                 <div className="mb-10">
                   <h3 className="font-bold text-lg mb-4 text-purple-800">
@@ -192,11 +214,9 @@ function MainPage() {
                           onClick={() => navigate(`/episode/${e.episode_id}`)}
                           className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-purple-300 hover:shadow-sm cursor-pointer transition-all border-l-4 border-l-purple-400"
                         >
-                          {/* 제목 */}
                           <h1 className="text-lg md:text-xl font-bold text-gray-800 mb-3">
                             {e.제목}
                           </h1>
-                          {/* 역량 태그 */}
                           <div className="flex flex-wrap gap-2 mb-3">
                             {[
                               e.competency_id_1,
@@ -237,7 +257,6 @@ function MainPage() {
                   </div>
                 </div>
               ) : (
-                /* [수정] 필터가 없을 때만 기존 역량 리스트를 보여줌 */
                 areas.map(area => (
                   <div key={area.name} className="mb-10">
                     <div className={`mb-4 border-l-4 ${area.color} pl-3`}>

@@ -1,44 +1,21 @@
 export default async function handler(req, res) {
-  // 1. 요청 메서드 로깅
   console.log("들어온 요청:", req.method);
 
-  // 2. 메서드 제한 없이 일단 시도
   try {
     const { messages, episode } = req.body || {};
 
     if (!messages) {
-      return res.status(200).json({
-        scores: { '신뢰/관계': 80, '니즈 파악': 80, '솔루션 제안': 80, '매너': 80 },
-        핵심노하우: ['메시지가 전달되지 않았지만 연동은 성공했습니다.'],
-        주의점: ['프론트엔드에서 데이터를 제대로 보내는지 확인하세요.']
-      });
+      return res.status(400).json({ error: "messages가 없습니다." });
     }
 
-    // 분석 로직 (메시지 변환)
     const conversationText = messages
       .filter((msg) => msg && msg.content)
       .map((msg) => `${msg.role === 'user' ? '영업사원' : '고객'}: ${msg.content}`)
       .join('\n');
 
-    const episodeText = episode ? (typeof episode === 'string' ? episode : JSON.stringify(episode, null, 2)) : '정보 없음';
-
-    // 성공 응답 반환
-    return res.status(200).json({
-      scores: { '신뢰/관계': 85, '니즈 파악': 90, '솔루션 제안': 85, '매너': 90 },
-      핵심노하우: ['테스트 성공!', '대화 구조가 확인되었습니다.'],
-      주의점: ['실제 Claude 연동 코드를 붙일 준비가 되었습니다.']
-    });
-
-  } catch (error) {
-    console.error("서버 에러:", error);
-    return res.status(500).json({ error: "강제 에러 발생" });
-  }
-    const conversationText = messages
-      .filter((msg) => msg && msg.content)
-      .map((msg) => `${msg.role === 'user' ? '영업사원' : '고객'}: ${msg.content}`)
-      .join('\n');
-
-    const episodeText = episode ? (typeof episode === 'string' ? episode : JSON.stringify(episode, null, 2)) : '정보 없음';
+    const episodeText = episode
+      ? (typeof episode === 'string' ? episode : JSON.stringify(episode, null, 2))
+      : '정보 없음';
 
     const prompt = `
 당신은 영업 코칭 및 롤플레잉 평가 전문가입니다.
@@ -50,104 +27,43 @@ ${episodeText}
 [대화 내용]
 ${conversationText}
 
-[평가 목적]
-- 영업사원의 실제 대화 역량을 분석한다.
-- 잘한 점과 부족한 점을 구체적으로 알려준다.
-- 이후 더 나은 영업 대화를 위한 실전 노하우를 제공한다.
-
 [평가 항목]
-1. 신뢰/관계
-- 고객과 라포를 형성했는가
-- 공감과 신뢰를 쌓는 표현이 있었는가
-- 일방적 제안보다 관계를 만드는 흐름이 있었는가
-
-2. 니즈 파악
-- 고객의 상황과 문제를 질문으로 잘 파악했는가
-- 고객의 숨은 니즈를 확인하려는 시도가 있었는가
-
-3. 솔루션 제안
-- 고객의 니즈와 연결된 해결책을 제시했는가
-- 제안이 구체적이고 설득력 있었는가
-- 너무 이르거나 일방적인 제안은 아니었는가
-
-4. 매너
-- 말투가 예의 바르고 부담스럽지 않았는가
-- 고객을 존중하는 표현을 사용했는가
-- 영업사원으로서 기본적인 커뮤니케이션 태도가 좋았는가
+1. 신뢰/관계: 라포 형성, 공감 표현, 관계 중심 흐름
+2. 니즈 파악: 질문을 통한 고객 상황/니즈 파악
+3. 솔루션 제안: 니즈 연결된 구체적 해결책 제시
+4. 매너: 예의 바른 말투, 고객 존중 표현
 
 [채점 규칙]
-- 각 점수는 0~100 사이의 정수로 작성
-- 실제 대화 내용 기준으로 냉정하게 평가
-- 근거 없는 고득점 금지
-- 질문이 부족하면 니즈 파악 점수를 낮게 줄 것
-- 솔루션 제안이 고객 니즈와 연결되지 않으면 점수를 낮게 줄 것
-- 말투가 무난하고 예의 있으면 매너 점수는 상대적으로 높게 줄 수 있음
+- 각 점수는 0~100 사이 정수
+- 실제 대화 기준으로 냉정하게 평가
+- 질문이 부족하면 니즈 파악 점수 낮게
+- 솔루션이 니즈와 무관하면 점수 낮게
 
-[핵심노하우 작성 규칙]
-- 반드시 배열 형태
-- 최소 3개, 최대 5개
-- 잘한 점 + 실전에서 계속 살려야 할 포인트를 작성
-- 추상적 표현보다 실제 행동 중심으로 작성
-
-[주의점 작성 규칙]
-- 반드시 배열 형태
-- 최소 3개, 최대 5개
-- 부족했던 점과 개선 방향을 작성
-- 비판만 하지 말고 어떻게 고치면 되는지도 포함
-
-[응답 형식]
-반드시 JSON만 출력하세요.
-마크다운 코드블록 사용 금지.
-설명 문장 금지.
-아래 형식을 정확히 지키세요.
-
+[응답 형식] 반드시 JSON만 출력. 마크다운 코드블록 금지.
 {
-  "scores": {
-    "신뢰/관계": 0,
-    "니즈 파악": 0,
-    "솔루션 제안": 0,
-    "매너": 0
-  },
-  "핵심노하우": [
-    "문장1",
-    "문장2",
-    "문장3"
-  ],
-  "주의점": [
-    "문장1",
-    "문장2",
-    "문장3"
-  ],
-}
-`;
+  "scores": { "신뢰/관계": 0, "니즈 파악": 0, "솔루션 제안": 0, "매너": 0 },
+  "핵심노하우": ["문장1", "문장2", "문장3"],
+  "주의점": ["문장1", "문장2", "문장3"]
+}`;
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
-
     if (!apiKey) {
-      return res.status(500).json({
-        error: '서버 환경변수에 ANTHROPIC_API_KEY가 없습니다.'
-      });
+      return res.status(500).json({ error: 'ANTHROPIC_API_KEY가 없습니다.' });
     }
 
-    const claudeResponse = await fetch('[api.anthropic.com](https://api.anthropic.com/v1/messages)', {
+    // ✅ URL 수정
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
-        temperature: 0.3,
-        system:
-          '당신은 영업 롤플레잉 평가 전문가입니다. 반드시 JSON만 출력하세요. 코드블록이나 설명 문장은 절대 출력하지 마세요.',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
+        system: '당신은 영업 롤플레잉 평가 전문가입니다. 반드시 JSON만 출력하세요. 코드블록이나 설명 문장은 절대 출력하지 마세요.',
+        messages: [{ role: 'user', content: prompt }]
       })
     });
 
@@ -155,54 +71,30 @@ ${conversationText}
 
     if (!claudeResponse.ok) {
       console.error('Claude API 호출 실패:', rawText);
-      return res.status(500).json({
-        error: 'Claude API 호출 실패',
-        detail: rawText
-      });
+      return res.status(500).json({ error: 'Claude API 호출 실패', detail: rawText });
     }
 
-    let claudeJson;
-    try {
-      claudeJson = JSON.parse(rawText);
-    } catch (parseError) {
-      console.error('Claude 원본 응답 JSON 파싱 실패:', rawText);
-      return res.status(500).json({
-        error: 'Claude 원본 응답 파싱 실패'
-      });
-    }
-
-    const modelText =
-      claudeJson?.content?.find((item) => item.type === 'text')?.text || '';
+    const claudeJson = JSON.parse(rawText);
+    const modelText = claudeJson?.content?.find((item) => item.type === 'text')?.text || '';
 
     if (!modelText) {
-      console.error('Claude 응답 텍스트 없음:', claudeJson);
-      return res.status(500).json({
-        error: 'Claude 응답 텍스트가 비어 있습니다.'
-      });
+      return res.status(500).json({ error: 'Claude 응답 텍스트가 비어 있습니다.' });
     }
 
-    let cleanText = modelText.trim();
-    cleanText = cleanText.replace(/```json/g, '').replace(/```/g, '');
-
+    const cleanText = modelText.trim().replace(/```json/g, '').replace(/```/g, '');
 
     let parsedReport;
     try {
       parsedReport = JSON.parse(cleanText);
     } catch (parseError) {
-      console.error('최종 리포트 JSON 파싱 실패:', cleanText);
-      return res.status(500).json({
-        error: '평가 결과 JSON 파싱 실패',
-        raw: modelText
-      });
+      console.error('리포트 JSON 파싱 실패:', cleanText);
+      return res.status(500).json({ error: '평가 결과 JSON 파싱 실패', raw: modelText });
     }
 
     return res.status(200).json(parsedReport);
-    try {
-     }  catch (error) { 
+
+  } catch (error) {
     console.error('evaluate API 전체 오류:', error);
-    return res.status(500).json({
-      error: "서버 처리 중 오류 발생",
-      details: error.message
-    });
+    return res.status(500).json({ error: '서버 처리 중 오류 발생', details: error.message });
   }
 }

@@ -30,7 +30,31 @@ const EvaluationReport = ({ reportData }) => {
           </RadarChart>
         </ResponsiveContainer>
       </div>
-
+      {/* 항목별 점수 */}
+<div className="grid grid-cols-2 gap-3">
+  {Object.entries(scores).map(([key, value]) => (
+    <div key={key} className="bg-white rounded-2xl p-4 border border-purple-100 shadow-sm">
+      <p className="text-xs text-gray-400 mb-1">{key}</p>
+      <div className="flex items-end gap-1">
+        <span className="text-2xl font-bold text-purple-700">{value}</span>
+        <span className="text-xs text-gray-400 mb-1">/ 100</span>
+      </div>
+      {/* 점수 바 */}
+      <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+       const getScoreColor = (score) => {
+  if (score >= 70) return 'bg-green-400';
+  if (score >= 40) return 'bg-purple-400';
+  return 'bg-red-400';
+};
+        <div
+          className="h-full rounded-full bg-purple-400 transition-all duration-500"
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    </div>
+  ))}
+</div>
+      
       {/* 핵심 노하우 영역 */}
       <div className="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm">
         <h3 className="font-bold text-purple-900 mb-3 text-lg">핵심 노하우</h3>

@@ -6,7 +6,7 @@ import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Footer from '../components/Footer';
 import RoleplayPanel from '../components/RoleplayPanel';
-import AboutPage from '../components/AboutPage';
+import { AboutPage } from '../components/AboutPage';
 import CompetencyInfo from '../components/CompetencyInfo';
 import Avatar from 'boring-avatars';
 

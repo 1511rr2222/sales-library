@@ -2,7 +2,7 @@ import React from 'react';
 import soloCharacter from '../solo.png'; // 1. 이미지 경로 확인 후 import!
 import soloTable from '../solo_table.png';
 
-function AboutPage() {
+export function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white ...">
       

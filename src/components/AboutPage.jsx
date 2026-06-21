@@ -8,11 +8,11 @@ export function AboutPage() {
       
       {/* 상단 캐릭터 배치 */}
       <div className="flex items-center gap-4 mb-8 bg-blue-50 p-6 rounded-2xl">
-        <div className="text-6xl">🏠✨</div>
-        {/* 2. 이미지 태그 사용 */}
+    
+       {/* 2. 이미지 태그 사용 */}
         <img src={soloCharacter} alt="솔로 캐릭터" className="w-20 h-20" /> 
         <div>
-          <h2 className="text-xl font-bold text-blue-900">안녕하세요! 한솔 큐레이터 '솔로(SOLO)'입니다!</h2>
+          <h2 className="text-xl font-bold text-blue-900">🏠✨안녕하세요! 한솔 큐레이터 '솔로(SOLO)'입니다!</h2>
           <p className="text-gray-600 mt-1">신입 큐레이터 여러분이 최고의 전문가로 성장하도록 꼼꼼하게 도와드릴게요.</p>
         </div>
       </div>
@@ -46,9 +46,8 @@ export function AboutPage() {
       {/* 하단 캐릭터 배치 */}
       <div className="text-center p-8 ...">
         <p className="text-lg font-bold text-gray-800">
-          "현장에서 최고의 전문가로 성장할 여러분의 활약을 솔로(SOLO)가 응원합니다! 💚💙"
+          "현장에서 최고의 전문가로 성장할 여러분의 활약을 솔로(SOLO)가 응원합니다!💚💙"
         </p>
-        <img src={soloCharacter} alt="응원하는 솔로" className="w-16 h-16 mx-auto mt-4" />
       </div>
 
       <div className="mt-10 flex justify-center">

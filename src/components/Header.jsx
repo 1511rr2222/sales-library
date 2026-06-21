@@ -82,7 +82,8 @@ return (
     // [수정] 모든 요소가 이 div 안에 들어가야 합니다
     <div className="relative w-full">
       {/* 로고를 div 안쪽으로 배치 */}
-      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-14 w-auto opacity-80" />
+      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-11
+       w-auto opacity-80" />
       
       {/* PC HEADER */}
       <div className="hidden md:block py-10 mb-8 border-b border-gray-200">

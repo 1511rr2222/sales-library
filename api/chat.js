@@ -24,9 +24,6 @@ export default async function handler(req, res) {
     const { messages, systemPrompt } = req.body;
     
     // 1. 서버 내부에서만 구글 시트 데이터를 가져옴 (브라우저와 격리됨)
-    const sheetData = await getSheetData();
-    const formattedKnowledge = sheetData.map(d => `상황: ${d['상황(SITUATION)']}`).join('\n');
-
     // 2. Claude API 호출
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -38,7 +35,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
-        system: `${systemPrompt}\n[지식]: ${formattedKnowledge}`,
+        system: systemPrompt,
         messages: messages
       })
     });

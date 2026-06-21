@@ -117,7 +117,7 @@ function MainPage() {
         <div className="py-3 md:py-5">
           <Header />
         </div>
-        <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-2 md:p-10">
+        <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-2 md:p-8">
           {/* SWITCH */}
           {!isSidebarOpen && (
           <div className="mt-6 mb-8">

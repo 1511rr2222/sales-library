@@ -12,11 +12,15 @@ const EvaluationReport = ({ reportData }) => {
     A: scores[key],
     fullMark: 100,
   }));
-
+  const getScoreColor = (score) => {
+  if (score >= 70) return 'bg-green-400';
+  if (score >= 40) return 'bg-purple-400';
+  return 'bg-red-400';
+};
   // 2. 내용 가져오기 (데이터 없으면 빈 배열)
   const 핵심노하우 = reportData?.핵심노하우 || ["대화 분석을 통해 맞춤형 노하우가 생성됩니다."];
   const 주의점 = reportData?.주의점 || ["대화를 분석 중입니다."];
-
+  
   return (
     <div className="space-y-6">
       {/* 레이더 차트 */}
@@ -41,13 +45,8 @@ const EvaluationReport = ({ reportData }) => {
       </div>
       {/* 점수 바 */}
       <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-       const getScoreColor = (score) => {
-  if (score >= 70) return 'bg-green-400';
-  if (score >= 40) return 'bg-purple-400';
-  return 'bg-red-400';
-};
         <div
-          className="h-full rounded-full bg-purple-400 transition-all duration-500"
+          className={`h-full rounded-full transition-all duration-500 ${getScoreColor(value)}`}
           style={{ width: `${value}%` }}
         />
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
-import soloCharacter from '../src/solo.png'; // 1. 이미지 경로 확인 후 import!
+import soloCharacter from '../solo.png'; // 1. 이미지 경로 확인 후 import!
+import soloTable from '../solo_table.png';
 
 function AboutPage() {
   return (
@@ -49,7 +50,14 @@ function AboutPage() {
         </p>
         <img src={soloCharacter} alt="응원하는 솔로" className="w-16 h-16 mx-auto mt-4" />
       </div>
-      
+
+      <div className="mt-10 flex justify-center">
+      <img 
+    src={soloTable} 
+    alt="솔로의 핵심 역량 가이드 표" 
+    className="w-full max-w-xl rounded-2xl shadow-md border border-gray-100" 
+      />
+      </div>
     </div>
   );
 }

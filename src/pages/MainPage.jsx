@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Footer from '../components/Footer';
 import RoleplayPanel from '../components/RoleplayPanel';
 import { AboutPage } from '../components/AboutPage';
-import CompetencyInfo from '../components/CompetencyInfo';
+import { CompetencyInfo } from '../components/CompetencyInfo';
 import Avatar from 'boring-avatars';
 
 function MainPage() {
@@ -183,19 +183,57 @@ function MainPage() {
                   <h3 className="font-bold text-lg mb-4 text-purple-800">
                     검색된 에피소드 ({filteredEpisodes.length}건)
                   </h3>
-                  <div className="grid gap-3">
-                    {filteredEpisodes.map(e => (
-                      <div
-                        key={e.episode_id}
-                        onClick={() => navigate(`/episode/${e.episode_id}`)}
-                        className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition-all border-l-4 border-l-purple-400"
-                      >
-                        <p className="font-bold text-base text-gray-900">{e.제목}</p>
-                        <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
-                          {e.개요 || "상세 설명이 없습니다."}
-                        </p>
-                      </div>
-                    ))}
+                  <div className="space-y-4">
+                    {filteredEpisodes.map(e => {
+                      const mentor = mentors.find(m => String(m.mentor_id) === String(e.mentor_id));
+                      return (
+                        <div
+                          key={e.episode_id}
+                          onClick={() => navigate(`/episode/${e.episode_id}`)}
+                          className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-purple-300 hover:shadow-sm cursor-pointer transition-all border-l-4 border-l-purple-400"
+                        >
+                          {/* 제목 */}
+                          <h1 className="text-lg md:text-xl font-bold text-gray-800 mb-3">
+                            {e.제목}
+                          </h1>
+                          {/* 역량 태그 */}
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {[
+                              e.competency_id_1,
+                              e.competency_id_2,
+                              e.competency_id_3,
+                              e.competency_id_4
+                            ]
+                              .filter(Boolean)
+                              .map(id => {
+                                const competency = competencies.find(c => String(c.competency_id) === String(id));
+                                return competency ? (
+                                  <span
+                                    key={id}
+                                    onClick={(ev) => { ev.stopPropagation(); navigate(`/skill/${competency.competency_id}`); }}
+                                    className={`${getColor(competency.역량명)} text-xs px-3 py-1 rounded-md cursor-pointer`}
+                                  >
+                                    #{competency.역량명}
+                                  </span>
+                                ) : null;
+                              })}
+                          </div>
+                          {mentor && (
+                            <div className="flex items-center gap-3">
+                              <Avatar
+                                size={32}
+                                name={mentor.mentor_id}
+                                variant="beam"
+                                colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+                              />
+                              <div className="text-xs md:text-sm font-medium text-gray-400">
+                                {mentor.팀} | {mentor['담당 상품']}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ) : (

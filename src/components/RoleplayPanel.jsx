@@ -19,6 +19,8 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
   const [isLoading, setIsLoading] = useState(false);
   const [isMistake, setIsMistake] = useState(false);
   const [reportData, setReportData] = useState(null);
+  // ✅ 추가: 선택지 state
+  const [choices, setChoices] = useState([]);
   const MAX_TURNS = 10;
 
   const getFavorabilityColors = (score) => {
@@ -26,6 +28,22 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     if (score >= 40) return ["#6366F1", "#818CF8", "#C7D2FE"];
     return ["#F43F5E", "#FB7185", "#FDA4AF"];
   };
+
+  // ✅ 추가: 응답에서 선택지 파싱
+  const parseChoices = (text) => {
+    const match = text.match(/\[CHOICES\]([\s\S]*?)\[\/CHOICES\]/);
+    if (!match) return [];
+    const lines = match[1].trim().split('\n').filter(Boolean);
+    return lines.map(line => {
+      if (line.startsWith('GOOD:'))    return line.replace('GOOD:', '').trim();
+      if (line.startsWith('NEUTRAL:')) return line.replace('NEUTRAL:', '').trim();
+      if (line.startsWith('BAD:'))     return line.replace('BAD:', '').trim();
+      return null;
+    }).filter(Boolean);
+  };
+
+  // ✅ 추가: 말풍선에서 선택지 태그 제거
+  const cleanReply = (text) => text.replace(/\[CHOICES\][\s\S]*?\[\/CHOICES\]/, '').trim();
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -50,6 +68,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     setStep('chat');
     setFavorability(50);
     setIsMistake(false);
+    setChoices([]); // ✅ 추가: 시작 시 선택지 초기화
     setIsLoading(true);
     try {
       const systemPrompt = getSystemPrompt(customerType, situation, targetEpisode);
@@ -63,7 +82,6 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     } catch (error) { console.error(error); } finally { setIsLoading(false); }
   };
 
-  // ✅ 수정: episode를 selectedEpisode(객체)로 올바르게 전달
   const fetchEvaluationReport = async (chatMessages) => {
     try {
       const response = await fetch("/api/evaluate", {
@@ -82,12 +100,15 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    
-    const newMessages = [...messages, { role: 'user', content: input }];
+  // ✅ 수정: overrideContent 파라미터 추가 (선택지 버튼 클릭 시 직접 전달)
+  const handleSend = async (overrideContent) => {
+    const content = overrideContent || input;
+    if (!content.trim() || isLoading) return;
+
+    const newMessages = [...messages, { role: 'user', content }];
     setMessages(newMessages);
     setInput('');
+    setChoices([]); // ✅ 추가: 전송 시 선택지 초기화
     setIsLoading(true);
 
     try {
@@ -109,7 +130,12 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
         setFavorability(currentFavorability);
       }
 
-      const updatedMessages = [...newMessages, { role: 'assistant', content: reply }];
+      // ✅ 추가: isMistake일 때만 선택지 파싱, 말풍선 텍스트 정리
+      const parsed = isMistake ? parseChoices(reply) : [];
+      setChoices(parsed);
+      const cleaned = cleanReply(reply);
+
+      const updatedMessages = [...newMessages, { role: 'assistant', content: cleaned }];
       setMessages(updatedMessages);
 
       const assistantTurns = updatedMessages.filter(m => m.role === 'assistant').length;
@@ -118,8 +144,8 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       const isSuccess = currentFavorability >= 70;
 
       if (isMaxTurns || isSuccess || isSessionEnd) {
+        setChoices([]); // ✅ 추가: 종료 시 선택지 숨김
         setStep('report');
-        // ✅ 수정: isAnalyzing으로 로딩 스피너 제어
         setIsAnalyzing(true);
         try {
           const report = await fetchEvaluationReport(updatedMessages);
@@ -204,7 +230,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
         <button 
           onClick={() => {
             ['rp_step', 'rp_messages', 'rp_customerType', 'rp_situation', 'rp_selectedEpisode', 'rp_favorability'].forEach(key => sessionStorage.removeItem(key)); 
-            setStep('setup'); setMessages([]); setFavorability(50); setIsMistake(false); setReportData(null);
+            setStep('setup'); setMessages([]); setFavorability(50); setIsMistake(false); setReportData(null); setChoices([]);
           }} 
           className="text-xs text-red-500 font-bold border border-red-200 px-3 py-1.5 rounded-lg bg-white"
         >종료</button>
@@ -212,7 +238,6 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
 
       {step === 'report' ? (
         <div className="flex-1 overflow-y-auto p-4 bg-purple-50/20">
-          {/* ✅ 수정: isAnalyzing으로 로딩 / reportData로 리포트 구분 */}
           {isAnalyzing ? (
             <div className="text-center p-10 text-purple-400">
               <div className="animate-spin mb-4 inline-block w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full" />
@@ -246,12 +271,27 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">
               💡 힌트 보기</button>
+
+            {/* ✅ 추가: 선택지 버튼 - 호감도가 한 번이라도 떨어진 후 선택지가 있을 때만 표시 */}
+            {isMistake && choices.length > 0 && (
+              <div className="flex flex-col gap-2 mb-4">
+                {choices.map((choice, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSend(choice)}
+                    className="w-full text-left text-sm px-4 py-2 bg-purple-50 border border-purple-200 rounded-xl text-purple-800 hover:bg-purple-100 transition-colors"
+                  >
+                    {i + 1}. {choice}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {(messages.filter(m => m.role === 'assistant').length >= 10 || favorability >= 70 || favorability <= 20) && ( 
               <button 
                 onClick={async () => {
                   console.log("평가 버튼이 클릭되었습니다!");
                   setStep('report');
-                  // ✅ 수정: isAnalyzing + fetchEvaluationReport 재사용 (episode: selectedEpisode 포함)
                   setIsAnalyzing(true);
                   try {
                     const report = await fetchEvaluationReport(messages);
@@ -270,7 +310,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
             )}         
             <div className="flex gap-2">
               <input value={input} disabled={isLoading} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} className="flex-1 border-2 border-purple-100 rounded-xl px-4 py-2" placeholder="메시지 입력..." />
-              <button onClick={handleSend} className="bg-purple-600 text-white p-3 rounded-xl"><Send size={18} /></button>
+              <button onClick={() => handleSend()} className="bg-purple-600 text-white p-3 rounded-xl"><Send size={18} /></button>
             </div>
           </div>
         </>

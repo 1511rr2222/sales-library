@@ -1,27 +1,40 @@
-import React, { useState } from 'react';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import { MessageCircle, X, Send } from "lucide-react";
 
 function ChatBot({ episode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: '안녕하세요! 저는 이 에피소드의 상황을 바탕으로 롤플레잉을 도와드릴 챗봇입니다. 편하게 연습을 시작해보세요!' }
+    {
+      role: "assistant",
+      content:
+        "안녕하세요! 저는 이 에피소드의 상황을 바탕으로 롤플레잉을 도와드릴 챗봇입니다. 편하게 연습을 시작해보세요!",
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
   const [failCount, setFailCount] = useState(0);
   const [isEnded, setIsEnded] = useState(false);
+  const messagesEndRef = useRef(null);
 
-  const userTurnCount = messages.filter(m => m.role === 'user').length;
+  const userTurnCount = messages.filter((m) => m.role === "user").length;
   const MAX_TURNS = 10;
+
+  // 데모용 기본 episode (episode prop이 없을 때)
+  const ep = episode || {
+    제목: "샘플 에피소드",
+    "상황(SITUATION)": "신규 거래처 첫 방문 영업 상황",
+    "세일즈팁(SALES TIP)": "고객의 고민을 먼저 파악하세요.",
+    "Why It Matters": "첫 인상이 거래 성사에 결정적 영향을 미칩니다.",
+  };
 
   const systemPrompt = `당신은 영업 롤플레잉 훈련을 돕는 AI입니다. 극도로 현실적인 '고객' 역할을 연기하며, 영업사원(사용자)이 실전 같은 압박감과 성취감을 느끼게 하는 것이 목표입니다.
 
 [현재 에피소드]
-- 제목: ${episode.제목}
-- 상황: ${episode['상황(SITUATION)']}
-- Tip: ${episode['세일즈팁(SALES TIP)']}
-- 놓치면 생기는 문제: ${episode['Why It Matters']}
+- 제목: ${ep.제목}
+- 상황: ${ep["상황(SITUATION)"]}
+- Tip: ${ep["세일즈팁(SALES TIP)"]}
+- 놓치면 생기는 문제: ${ep["Why It Matters"]}
 
 [역할 설정]
 - 역할을 시작하기 전, '상황'에서 다음 세 가지를 먼저 파악하세요.
@@ -83,23 +96,34 @@ function ChatBot({ episode }) {
 - 단 하나의 예외 — '/힌트': 영업사원이 '/힌트'라고 입력하면, [코치] 표시와 함께 지금 상황에서 바로 던질 수 있는 구체적인 예시 한 마디를 보여주세요. (예: "공급 끊긴다는 소문 때문에 발주 망설이고 계시죠? 처럼 고객 고민을 직접 건드려 보세요.") 단 Tip의 정답 자체는 그대로 알려주지 말고 접근 방향을 보여주는 선까지만. 그 후 곧바로 고객 역할로 복귀하세요.
 - 항상 한국어로 대화하세요.`;
 
-
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
 
   const parseStatus = (rawContent) => {
     const match = rawContent.match(/\[STATUS:\s*(ongoing|success|fail)\]/i);
-    const status = match ? match[1].toLowerCase() : 'ongoing';
-    const cleanContent = rawContent.replace(/\[STATUS:\s*(ongoing|success|fail)\]/i, '').trim();
+    const status = match ? match[1].toLowerCase() : "ongoing";
+    const cleanContent = rawContent
+      .replace(/\[STATUS:\s*(ongoing|success|fail)\]/gi, "")
+      .trim();
     return { status, cleanContent };
   };
 
   const callChatApi = async (messageList) => {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        systemPrompt,
-        messages: messageList.map(m => ({ role: m.role, content: m.content }))
-      })
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: messageList.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+      }),
     });
     const data = await response.json();
     return data.content[0].text;
@@ -108,16 +132,20 @@ function ChatBot({ episode }) {
   const handleDebrief = async (history) => {
     setIsLoading(true);
     const debriefTrigger = {
-      role: 'user',
-      content: '(아래는 지금까지의 전체 롤플레잉 대화입니다. 이 대화를 종합 평가하세요)'
+      role: "user",
+      content:
+        "(아래는 지금까지의 전체 롤플레잉 대화입니다. 이 대화를 종합 평가하세요)",
     };
     try {
       const raw = await callChatApi([...history, debriefTrigger]);
-      setMessages(prev => [...prev, { role: 'assistant', content: raw }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: raw }]);
       setIsEnded(true);
     } catch (error) {
-      console.error('디브리핑 오류:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: '디브리핑 생성 중 오류가 발생했습니다.' }]);
+      console.error("디브리핑 오류:", error);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "디브리핑 생성 중 오류가 발생했습니다." },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -126,17 +154,21 @@ function ChatBot({ episode }) {
   const handleForceEnd = async (history) => {
     setIsLoading(true);
     const forceTrigger = {
-      role: 'user',
-      content: '(지금까지의 대화를 기준으로 반드시 성공 또는 실패 중 하나로 최종 판정하세요)'
+      role: "user",
+      content:
+        "(지금까지의 대화를 기준으로 반드시 성공 또는 실패 중 하나로 최종 판정하세요)",
     };
     try {
       const raw = await callChatApi([...history, forceTrigger]);
       const { cleanContent } = parseStatus(raw);
-      const finalHistory = [...history, { role: 'assistant', content: cleanContent }];
+      const finalHistory = [
+        ...history,
+        { role: "assistant", content: cleanContent },
+      ];
       setMessages(finalHistory);
       await handleDebrief(finalHistory);
     } catch (error) {
-      console.error('강제 종료 오류:', error);
+      console.error("강제 종료 오류:", error);
       setIsLoading(false);
     }
   };
@@ -144,26 +176,31 @@ function ChatBot({ episode }) {
   const handleSend = async () => {
     if (!input.trim() || isLoading || isEnded) return;
 
-    const userMessage = { role: 'user', content: input };
+    const userMessage = { role: "user", content: input };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     try {
       const raw = await callChatApi(newMessages);
       const { status, cleanContent } = parseStatus(raw);
-      const updatedMessages = [...newMessages, { role: 'assistant', content: cleanContent }];
+      const updatedMessages = [
+        ...newMessages,
+        { role: "assistant", content: cleanContent },
+      ];
       setMessages(updatedMessages);
 
       let newSuccessCount = successCount;
       let newFailCount = failCount;
-      if (status === 'success') newSuccessCount += 1;
-      if (status === 'fail') newFailCount += 1;
+      if (status === "success") newSuccessCount += 1;
+      if (status === "fail") newFailCount += 1;
       setSuccessCount(newSuccessCount);
       setFailCount(newFailCount);
 
-      const newUserTurnCount = updatedMessages.filter(m => m.role === 'user').length;
+      const newUserTurnCount = updatedMessages.filter(
+        (m) => m.role === "user"
+      ).length;
 
       if (newSuccessCount >= 3 || newFailCount >= 3) {
         setIsLoading(false);
@@ -177,19 +214,26 @@ function ChatBot({ episode }) {
         return;
       }
     } catch (error) {
-      console.error('API 오류:', error);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: '죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.'
-      }]);
+      console.error("API 오류:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleManualEnd = async () => {
-    if (isLoading || isEnded || messages.filter(m => m.role === 'user').length === 0) return;
-    setIsLoading(false);
+    if (
+      isLoading ||
+      isEnded ||
+      messages.filter((m) => m.role === "user").length === 0
+    )
+      return;
     await handleForceEnd(messages);
   };
 
@@ -197,21 +241,27 @@ function ChatBot({ episode }) {
     <>
       {/* 플로팅 버튼 */}
       <button
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => setIsOpen((prev) => !prev)}
         className="fixed bottom-8 right-8 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all hover:-translate-y-1 flex items-center justify-center z-50"
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </button>
 
       {/* 채팅 창 */}
-      <div className={`fixed bottom-28 right-8 w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-100 transition-all duration-300 ease-out ${
-        isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'
-      }`}>
+      <div
+        className={`fixed bottom-28 right-8 w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-100 transition-all duration-300 ease-out ${
+          isOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-8 pointer-events-none"
+        }`}
+      >
         {/* 헤더 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-indigo-600 rounded-t-2xl">
           <div>
             <div className="text-white font-semibold text-sm">롤플레잉 챗봇</div>
-            <div className="text-indigo-200 text-xs">{userTurnCount}/{MAX_TURNS}턴</div>
+            <div className="text-indigo-200 text-xs">
+              {userTurnCount}/{MAX_TURNS}턴
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {!isEnded && userTurnCount > 0 && (
@@ -231,60 +281,26 @@ function ChatBot({ episode }) {
           </div>
         </div>
 
-       
         {/* 메시지 영역 */}
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-          {messages.map((msg, index) => {
-      
-            return (
-
-              <div 
-        key={i} 
-        className="py-1.5 border-b border-gray-100 last:border-0 text-sm leading-relaxed hover:bg-indigo-50 transition-colors"
-      >
-        {/* 여기서 직접 문자열을 조합하여 사용합니다 */}
-        {part + (arr[i + 1] || "")}
-      </div>
-                <div className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${
-                  msg.role === 'user' 
-                    ? 'bg-indigo-600 text-white rounded-br-none' 
-                    : 'bg-gray-100 text-gray-700 rounded-bl-none'
-                }`}>
-                
-                  {!hasOptions ? (
-                    msg.content
-                  ) : (
-                    (() => {
-                      const content = msg.content;
-                      const parts = content.split(/(\d+\.)/);
-                      const mainContent = parts[0].replace('[선택지]', '');
-                      
-                      return (
-                        <div className="flex flex-col">
-                          <p className="whitespace-pre-wrap">{mainContent.trim()}</p>
-                          {parts.slice(1).map((part, i, arr) => {
-  if (i % 2 === 0) {
-    return (
-      /* 1. map 내부의 각 항목은 하나의 div로 감싸져야 합니다 */
-      <div 
-        key={i} 
-        className="py-1.5 border-b border-gray-100 last:border-0 text-sm leading-relaxed hover:bg-indigo-50 transition-colors"
-      >
-        {part + (arr[i + 1] || "")}
-      </div>
-    );
-  }
-  return null;
-})}
-                      })}
-                    </div>
-                      );
-                    })()
-                  )}
-                </div>
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`max-w-[85%] px-3 py-2 rounded-xl text-sm whitespace-pre-wrap ${
+                  msg.role === "user"
+                    ? "bg-indigo-600 text-white rounded-br-none"
+                    : "bg-gray-100 text-gray-700 rounded-bl-none"
+                }`}
+              >
+                {msg.content}
               </div>
-            );
-          })}
+            </div>
+          ))}
           {isLoading && (
             <div className="flex justify-start">
               <div className="bg-gray-100 text-gray-400 px-3 py-2 rounded-xl rounded-bl-none text-sm">
@@ -292,6 +308,7 @@ function ChatBot({ episode }) {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* 입력 영역 */}
@@ -300,8 +317,8 @@ function ChatBot({ episode }) {
             <input
               type="text"
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="메시지를 입력하세요..."
               disabled={isLoading}
               className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-400 disabled:bg-gray-50"

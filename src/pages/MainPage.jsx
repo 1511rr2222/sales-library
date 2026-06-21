@@ -94,6 +94,7 @@ function MainPage() {
           <nav className="flex-1 mt-4 px-2 pt-10 md:pt-0">
             <button onClick={() => { setView('AboutPage'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">Sales Library 설명</button>
             <button onClick={() => { setView('CompetencyInfo'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">역량별 설명</button>
+            <button onClick={() => { setView('CompeAnalysis'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">오늘의 역량</button>
           </nav>
         )}
       </div>
@@ -116,7 +117,7 @@ function MainPage() {
         <div className="py-3 md:py-5">
           <Header />
         </div>
-        <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-2 md:p-6">
+        <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-2 md:p-10">
           {/* SWITCH */}
           {!isSidebarOpen && (
           <div className="mt-6 mb-8">

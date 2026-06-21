@@ -40,7 +40,7 @@ function Header() {
       ) : (
         <div className="w-full">
           <h1
-            className="text-6xl md:text-7xl font-normal tracking-tight leading-tight mb-5"
+            className="text-6xl md:text-7xl font-normal tracking-tight leading-tight mb-8 mt-4"
             style={{ fontFamily: "'DM Serif Display', serif" }}
           >
             <span style={{ color: '#1a1a2e' }}>Sales </span>
@@ -82,7 +82,7 @@ return (
     // [수정] 모든 요소가 이 div 안에 들어가야 합니다
     <div className="relative w-full">
       {/* 로고를 div 안쪽으로 배치 */}
-      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-11
+      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-7
        w-auto opacity-80" />
       
       {/* PC HEADER */}

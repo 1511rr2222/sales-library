@@ -56,9 +56,9 @@ const EvaluationReport = ({ reportData }) => {
       
       {/* 핵심 노하우 영역 */}
       <div className="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm">
-        <h3 className="font-bold text-purple-900 mb-3 text-lg">핵심 노하우</h3>
+        <h3 className="font-bold text-purple-900 mb-3 text-lg">강점</h3>
         <ul className="space-y-2">
-          {핵심노하우.map((item, i) => (
+          {강점.map((item, i) => (
             <li key={i} className="text-sm text-gray-700 flex items-start">
               <span className="text-purple-500 mr-2">•</span> {item}
             </li>

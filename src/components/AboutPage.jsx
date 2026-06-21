@@ -1,30 +1,39 @@
 import React from 'react';
-import soloCharacter from '../solo.png'; // 1. 이미지 경로 확인 후 import!
+import soloCharacter from '../solo.png';
+import soloProfile from '../soloprofile.png';
 import soloTable from '../solo_table.png';
 
 export function AboutPage() {
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white ...">
-      
-      {/* 상단 캐릭터 배치 */}
-      <div className="flex items-center gap-4 mb-8 bg-blue-50 p-6 rounded-2xl">
-    
-       {/* 2. 이미지 태그 사용 */}
-        <img src={soloCharacter} alt="솔로 캐릭터" className="w-30 h-30" /> 
+    <div className="max-w-3xl mx-auto p-8 bg-white">
+
+      {/* soloprofile 크게 위에 */}
+      <div className="flex justify-center mb-4">
+        <img src={soloProfile} alt="솔로 프로필" className="w-40 h-40 object-contain" />
+      </div>
+
+      {/* 파란 카드 */}
+      <div className="relative bg-blue-50 p-6 rounded-2xl mb-8">
+
+        {/* 떠다니는 soloCharacter */}
+        <img
+          src={soloCharacter}
+          alt="솔로 캐릭터"
+          className="absolute -top-5 -right-2 w-12 h-12 drop-shadow-md"
+        />
+
         <div>
           <h2 className="text-xl font-bold text-blue-900">🏠✨안녕하세요! 한솔 큐레이터 '솔로(SOLO)'입니다!</h2>
           <p className="text-gray-600 mt-1">신입 큐레이터 여러분이 최고의 전문가로 성장하도록 꼼꼼하게 도와드릴게요.</p>
         </div>
       </div>
-      
+
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Sales Library란?</h1>
       <p className="text-gray-700 leading-relaxed mb-6">
-        본 Sales Library는 단순한 영업사원을 넘어, 현장의 여건과 트렌드에 맞는 
+        본 Sales Library는 단순한 영업사원을 넘어, 현장의 여건과 트렌드에 맞는
         <strong className="text-blue-600"> '최적의 통합 솔루션'을 제안하는 큐레이터</strong>로의 역량 강화를 위해 설계되었습니다.
       </p>
 
-
-      {/* ... (표 내용) ... */}
       <div className="overflow-x-auto mb-10">
         <table className="w-full text-sm border-collapse">
           <thead>
@@ -43,19 +52,18 @@ export function AboutPage() {
         </table>
       </div>
 
-      {/* 하단 캐릭터 배치 */}
-      <div className="text-center p-8 ...">
+      <div className="text-center p-8">
         <p className="text-lg font-bold text-gray-800">
           "현장에서 최고의 전문가로 성장할 여러분의 활약을 솔로(SOLO)가 응원합니다!💚💙"
         </p>
       </div>
 
       <div className="mt-10 flex justify-center">
-      <img 
-    src={soloTable} 
-    alt="솔로의 핵심 역량 가이드 표" 
-    className="w-full max-w-xl rounded-2xl shadow-md border border-gray-100" 
-      />
+        <img
+          src={soloTable}
+          alt="솔로의 핵심 역량 가이드 표"
+          className="w-full max-w-xl rounded-2xl shadow-md border border-gray-100"
+        />
       </div>
     </div>
   );

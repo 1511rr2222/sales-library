@@ -305,7 +305,7 @@ function MainPage() {
               <CompetencyInfo />
             </div>
             {/* COMPE ANALYSIS VIEW */}
-            <div className={`transition-all duration-300 ${view === 'compeAnalysis' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+            <div className={`transition-all duration-300 ${view === 'CompeAnalysis' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
               <CompeAnalysis />
             </div>
 

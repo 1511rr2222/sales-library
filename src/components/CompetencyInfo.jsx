@@ -69,7 +69,7 @@ const areas = [
 
       {/* 상단 캐릭터 인사 */}
       <div className="flex items-center gap-5 mb-16 pb-10 border-b border-gray-100">
-        <img src={soloCharacter} alt="솔로 캐릭터" className="w-25 h-30 shrink-0" />
+        <img src={soloCharacter} alt="솔로 캐릭터" className="w-18 h-20 shrink-0" />
         <div>
           <p className="text-xs font-medium tracking-wide text-gray-400 uppercase mb-1">
             Competency Model
@@ -114,7 +114,7 @@ const areas = [
               <img
                 src={area.img}
                 alt={area.title}
-                className="w-full max-h-56 object-cover rounded-xl mb-8 border border-gray-100"
+                className="w-full object-cover rounded-xl mb-8 border border-gray-100"
               />
 
               {/* 영역별 상세 역량 카드 리스트 */}

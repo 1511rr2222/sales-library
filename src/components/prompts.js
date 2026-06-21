@@ -1,5 +1,4 @@
 export const getSystemPrompt = (customerType, situation, episode) => {
-const safeEpisode = episode || {};
 const rules = `
 
 당신은 ${customerType} 고객입니다. 현재 [${situation}] 상황에서 영업사원과 대화 중입니다.

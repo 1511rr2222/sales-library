@@ -21,6 +21,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
   const [reportData, setReportData] = useState(null);
   const [choices, setChoices] = useState([]);
   const [resultType, setResultType] = useState(null); // 'success' | 'fail'
+  const [favorabilityTag, setFavorabilityTag] = useState(null); // ex) "니즈 파악 12점 하강/ 호감도: 55점"
   const MAX_TURNS = 10;
 
   const getFavorabilityColors = (score) => {
@@ -120,10 +121,12 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       const data = await response.json();
       const reply = data.content[0].text;
       
-      const match = reply.match(/\[호감도: (\d+)\]/);
+      // [니즈 파악 12점 하강/ 호감도: 55점] 또는 [변화 없음/ 호감도: 55점] 파싱
+      const tagMatch = reply.match(/\[([^\]]+?\/\s*호감도:\s*(\d+)점?)\]/);
       let currentFavorability = favorability;
-      if (match) {
-        currentFavorability = parseInt(match[1]);
+      if (tagMatch) {
+        currentFavorability = parseInt(tagMatch[2]);
+        setFavorabilityTag(tagMatch[1].trim());
         if (currentFavorability < favorability) setIsMistake(true);
         setFavorability(currentFavorability);
       }

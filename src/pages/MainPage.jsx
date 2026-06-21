@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import RoleplayPanel from '../components/RoleplayPanel';
 import { AboutPage } from '../components/AboutPage';
 import { CompetencyInfo } from '../components/CompetencyInfo';
+import { CompeAnalysis } from '../components/CompeAnalysis';
 import Avatar from 'boring-avatars';
 
 function MainPage() {
@@ -302,6 +303,10 @@ function MainPage() {
             {/* COMPETENCY INFO VIEW */}
             <div className={`transition-all duration-300 ${view === 'CompetencyInfo' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
               <CompetencyInfo />
+            </div>
+            {/* COMPE ANALYSIS VIEW */}
+            <div className={`transition-all duration-300 ${view === 'compeAnalysis' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
+              <CompeAnalysis />
             </div>
 
           </div>

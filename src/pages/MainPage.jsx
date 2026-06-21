@@ -92,6 +92,7 @@ function MainPage() {
         </div>
         <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-2 md:p-6">
           {/* SWITCH */}
+          {!isSidebarOpen && (
           <div className="mt-6 mb-8">
             <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
               <div className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
@@ -105,6 +106,7 @@ function MainPage() {
                 전체 에피소드</button>
             </div>
           </div>
+          )}
 
           {/* VIEW AREA */}
           <div className="relative min-h-[100vh]">

@@ -40,7 +40,7 @@ function Header() {
       ) : (
         <div className="w-full">
           <h1
-            className="text-5xl md:text-6xl font-normal tracking-tight leading-tight mb-4"
+            className="text-6xl md:text-7xl font-normal tracking-tight leading-tight mb-5"
             style={{ fontFamily: "'DM Serif Display', serif" }}
           >
             <span style={{ color: '#1a1a2e' }}>Sales </span>
@@ -57,17 +57,17 @@ function Header() {
           </h1>
 
           <div
-            className="rounded-xl px-5 py-4 mt-2"
+            className="rounded-xl px-6 py-5 mt-2"
             style={{
               backgroundColor: '#f5f3ff',
               border: '1.5px solid #c4b5fd',
             }}
           >
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-base text-gray-700 leading-relaxed">
               영업 사원 여러분들의 역량 성장을 위한 케이스 라이브러리입니다.
             </p>
             <p
-              className="text-sm font-semibold mt-1"
+              className="text-base font-semibold mt-1"
               style={{ color: '#7c3aed' }}
             >
               습득하고 싶은 역량을 클릭 후 관련 사례를 읽어보세요!
@@ -85,7 +85,7 @@ return (
       <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-8 w-auto opacity-80" />
       
       {/* PC HEADER */}
-      <div className="hidden md:block py-6 mb-6 border-b border-gray-200">
+      <div className="hidden md:block py-10 mb-8 border-b border-gray-200">
         <div className="flex items-start gap-3">
           <div className="pt-2">
             <BackButton />

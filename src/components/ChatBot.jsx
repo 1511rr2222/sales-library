@@ -235,9 +235,15 @@ function ChatBot({ episode }) {
         {/* 메시지 영역 */}
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {messages.map((msg, index) => {
-            const hasOptions = msg.content.includes('[선택지]');
+      
             return (
-              <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+               <div 
+        key={i} 
+        className="py-1.5 border-b border-gray-100 last:border-0 text-sm leading-relaxed hover:bg-indigo-50 transition-colors"
+      >
+        {/* 여기서 직접 문자열을 조합하여 사용합니다 */}
+        {part + (arr[i + 1] || "")}
+      </div>
                 <div className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${
                   msg.role === 'user' 
                     ? 'bg-indigo-600 text-white rounded-br-none' 

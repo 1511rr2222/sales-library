@@ -237,7 +237,8 @@ function ChatBot({ episode }) {
           {messages.map((msg, index) => {
       
             return (
-               <div 
+
+              <div 
         key={i} 
         className="py-1.5 border-b border-gray-100 last:border-0 text-sm leading-relaxed hover:bg-indigo-50 transition-colors"
       >
@@ -249,6 +250,7 @@ function ChatBot({ episode }) {
                     ? 'bg-indigo-600 text-white rounded-br-none' 
                     : 'bg-gray-100 text-gray-700 rounded-bl-none'
                 }`}>
+                
                   {!hasOptions ? (
                     msg.content
                   ) : (
@@ -260,19 +262,20 @@ function ChatBot({ episode }) {
                       return (
                         <div className="flex flex-col">
                           <p className="whitespace-pre-wrap">{mainContent.trim()}</p>
-                          {parts.length > 1 && (
-                            <div className="font-bold border-t border-gray-300 pt-2 mb-2 text-indigo-700">[선택지]</div>
-                          )}
                           {parts.slice(1).map((part, i, arr) => {
-                          if (i % 2 === 0) {
-                            const content = arr[i + 1] ? part + arr[i + 1] : part;
-                            return (
-                            <div key={i} className="py-1.5 border-b border-gray-100 last:border-0 text-sm leading-relaxed hover:bg-indigo-50 transition-colors">
-                              {part + arr[i + 1]}
-                            </div>
-                          );
-                        }
-                        return null;
+  if (i % 2 === 0) {
+    return (
+      /* 1. map 내부의 각 항목은 하나의 div로 감싸져야 합니다 */
+      <div 
+        key={i} 
+        className="py-1.5 border-b border-gray-100 last:border-0 text-sm leading-relaxed hover:bg-indigo-50 transition-colors"
+      >
+        {part + (arr[i + 1] || "")}
+      </div>
+    );
+  }
+  return null;
+})}
                       })}
                     </div>
                       );

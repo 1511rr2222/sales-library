@@ -21,7 +21,6 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
   const [reportData, setReportData] = useState(null);
   const [choices, setChoices] = useState([]);
   const [resultType, setResultType] = useState(null); // 'success' | 'fail'
-  const [favorabilityTag, setFavorabilityTag] = useState(null); // ex) "니즈 파악 12점 하강/ 호감도: 55점"
   const MAX_TURNS = 10;
 
   const getFavorabilityColors = (score) => {
@@ -126,7 +125,6 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       let currentFavorability = favorability;
       if (tagMatch) {
         currentFavorability = parseInt(tagMatch[2]);
-        setFavorabilityTag(tagMatch[1].trim());
         if (currentFavorability < favorability) setIsMistake(true);
         setFavorability(currentFavorability);
       }
@@ -219,7 +217,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col min-h-[600px] max-h-[85vh] overflow-hidden"> 
+    <div className="bg-white rounded-2xl shadow-sm border border-purple-100 max-w-xl mx-auto flex flex-col min-h-[85vh] overflow-hidden"> 
       <div className="px-5 py-4 border-b border-purple-100 bg-purple-50/50 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Avatar size={60} name={customerType} variant="beam" colors={getFavorabilityColors(favorability)} />
@@ -290,7 +288,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
       {/* 채팅 화면 */}
       {step === 'chat' && (
         <>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-[300px]">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>{m.content}</div>

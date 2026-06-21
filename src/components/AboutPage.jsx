@@ -1,20 +1,55 @@
 import React from 'react';
+import soloCharacter from '../src/solo.png'; // 1. 이미지 경로 확인 후 import!
 
 function AboutPage() {
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-      <h1 className="text-2xl font-bold mb-4">Sales Library란?</h1>
-      <p>본 Sales Library는 영업사원들의 큐레이터로의 역량 강화를 위해 만들어졌습니다.</p>
-      <p>영업사원은 주어진 요구에 따라 개별 제품의 스펙 전달과 단가 위주의 영업을 수행하는 일반 사원을 말한다면, 큐레이터는 한솔의 종합 자재들을 활용하여 현장 여건 및 트렌드에 맞는 최적의 통합 솔루션을 제안하는 비즈니스 파트너를 말합니다.</p>
-      <p>영업사원과 큐레이터는 다음 관점에서 큰 차이가 있습니다.</p>
-      <p>단순 제품 판매 vs. 맞춤형 통합 솔루션 제안: 기존 영업이 개별 제품 중심의 스펙 전달에 집중했다면, 큐레이터는 고객의 공간과 스타일에 맞춰 전사 제·상품을 조합하여 최적의 패키지와 통합 솔루션을 제안합니다</p>
-      <p>일회성 거래 vs. 장기적 파트너십 구축: 단순한 신규 고객 발굴이나 일회성 미팅에 그치지 않고, TI점(인테리어점) 등 주요 고객과 깊이 소통하며 동반 성장을 이끄는 장기적이고 전략적인 파트너십을 형성합니다</p>
-      <p>수동적 대응 vs. 주도적인 가치 창출(크로스셀링): 주어진 요구사항에만 대응하는 것을 넘어, 시장 변화를 한발 앞서 읽어내고 고객의 숨겨진 니즈를 발굴하여 크로스셀링(교차 판매)을 통한 새로운 비즈니스 가치와 매출 확장을 이끌어냅니다</p>
-      <p>단가 중심 설명 vs. 전문적인 큐레이션: 무조건적인 단가 경쟁을 지양하고, 현장의 여건, 시공성, 고객의 취향(디자인, 패턴, 질감 등)을 종합적으로 고려하여 가장 알맞은 2~3가지 대안을 전문적으로 비교하고 추천합니다</p>
-      <p>개인 역량 의존 vs. 표준화된 영업 전문가: 기존 영업이 개인의 경험과 감에 의존해 성과 편차가 컸다면, 큐레이터는 디지털 리터러시와 구조화된 역량 체계를 바탕으로 일관되고 신뢰성 있는 성과를 주도적으로 만들어냅니다</p>
-      <p>앞으로 이 역량체계를 바탕으로 현장에서 최고의 전문가로 성장해 나갈 신입 큐레이터 여러분의 눈부신 활약을 응원합니다!</p>
+    <div className="max-w-3xl mx-auto p-8 bg-white ...">
+      
+      {/* 상단 캐릭터 배치 */}
+      <div className="flex items-center gap-4 mb-8 bg-blue-50 p-6 rounded-2xl">
+        <div className="text-6xl">🏠✨</div>
+        {/* 2. 이미지 태그 사용 */}
+        <img src={soloCharacter} alt="솔로 캐릭터" className="w-20 h-20" /> 
+        <div>
+          <h2 className="text-xl font-bold text-blue-900">안녕하세요! 한솔 큐레이터 '솔로(SOLO)'입니다!</h2>
+          <p className="text-gray-600 mt-1">신입 큐레이터 여러분이 최고의 전문가로 성장하도록 꼼꼼하게 도와드릴게요.</p>
+        </div>
+      </div>
+      
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">Sales Library란?</h1>
+      <p className="text-gray-700 leading-relaxed mb-6">
+        본 Sales Library는 단순한 영업사원을 넘어, 현장의 여건과 트렌드에 맞는 
+        <strong className="text-blue-600"> '최적의 통합 솔루션'을 제안하는 큐레이터</strong>로의 역량 강화를 위해 설계되었습니다.
+      </p>
+
+
+      {/* ... (표 내용) ... */}
+      <div className="overflow-x-auto mb-10">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-gray-100 text-gray-700">
+              <th className="p-4 border">구분</th>
+              <th className="p-4 border">영업사원</th>
+              <th className="p-4 border">큐레이터</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600">
+            <tr className="border-b"><td className="p-4 font-bold border">판매 방식</td><td className="p-4 border">단순 제품 스펙 전달</td><td className="p-4 border">맞춤형 통합 솔루션 제안</td></tr>
+            <tr className="border-b"><td className="p-4 font-bold border">고객 관계</td><td className="p-4 border">일회성 거래 중심</td><td className="p-4 border">전략적 동반 파트너십</td></tr>
+            <tr className="border-b"><td className="p-4 font-bold border">영업 태도</td><td className="p-4 border">수동적 요구 대응</td><td className="p-4 border">주도적 가치 창출(크로스셀링)</td></tr>
+            <tr className="border-b"><td className="p-4 font-bold border">설명 관점</td><td className="p-4 border">단가 중심</td><td className="p-4 border">디자인, 질감, 시공성 중심</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 하단 캐릭터 배치 */}
+      <div className="text-center p-8 ...">
+        <p className="text-lg font-bold text-gray-800">
+          "현장에서 최고의 전문가로 성장할 여러분의 활약을 솔로(SOLO)가 응원합니다! 💚💙"
+        </p>
+        <img src={soloCharacter} alt="응원하는 솔로" className="w-16 h-16 mx-auto mt-4" />
+      </div>
+      
     </div>
   );
 }
-
-export default AboutPage;

@@ -69,7 +69,7 @@ function MainPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* 좌측 패널 (사이드바) */}
-      <div className={`transition-all duration-300 bg-white border-r h-screen flex flex-col ${isSidebarOpen ? 'w-40' : 'w-16'}`}>
+      <div className={`transition-all duration-300 bg-white border-r h-screen flex flex-col ${isSidebarOpen ? 'w-48' : 'w-16'}`}>
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-4 w-full">
           <div className="space-y-1.5 flex flex-col items-center">
             <div className="w-6 h-0.5 bg-gray-600"></div>
@@ -87,8 +87,10 @@ function MainPage() {
 
       {/* PAGE CONTAINER */}
       <div className="flex-1 flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-4 md:p-8">
+        <div className="py-3 md:py-5">
+          <Header />
+        </div>
+        <main className="flex-grow max-w-4xl w-full mx-auto flex-1 px-4 py-2 md:p-6">
           {/* SWITCH */}
           <div className="mt-6 mb-8">
             <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
@@ -110,52 +112,54 @@ function MainPage() {
             {/* 전체에피소드 목록 view */}
             <div className={`transition-all duration-300 ${view === 'allEpisodes' ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'}`}>
               <h3 className="font-bold text-lg mb-4 text-blue-800">모든 에피소드 ({episodes.length}건)</h3>
-              {episodes.map(episode => {
-                const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
-                return (
-                  <div key={episode.episode_id} className="bg-gray-50 rounded-xl p-5 mb-8 border border-gray-400">
-                    {/* 제목 */}
-                    <h1 className="text-xl md:text-3xl font-bold text-gray-800 mb-5">
-                      {episode.제목}
-                    </h1>
-                    {/* 역량 태그 */}
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {[
-                        episode.competency_id_1,
-                        episode.competency_id_2,
-                        episode.competency_id_3,
-                        episode.competency_id_4
-                      ]
-                        .filter(Boolean)
-                        .map(id => {
-                          const competency = competencies.find(c => String(c.competency_id) === String(id));
-                          return competency ? (
-                            <span
-                              key={id}
-                              onClick={() => navigate(`/skill/${competency.competency_id}`)}
-                              className={`${getColor(competency.역량명)} text-xs px-3 py-1 rounded-md cursor-pointer`}
-                            >
-                              #{competency.역량명}
-                            </span>
-                          ) : null;
-                        })}
-                    </div>
-                    {mentor && (
-                      <div className="flex items-center gap-3">
-                        <Avatar
-                          size={36}
-                          name={mentor.mentor_id}
-                          variant="beam"
-                          colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
-                        />
-                        <div className="text-xs md:text-sm font-medium text-gray-400">
-                          {mentor.팀} | {mentor['담당 상품']}
-                        </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {episodes.map(episode => {
+                  const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
+                  return (
+                    <div key={episode.episode_id} className="bg-gray-50 rounded-lg p-3 border border-gray-300">
+                      {/* 제목 */}
+                      <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">
+                        {episode.제목}
+                      </h1>
+                      {/* 역량 태그 */}
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {[
+                          episode.competency_id_1,
+                          episode.competency_id_2,
+                          episode.competency_id_3,
+                          episode.competency_id_4
+                        ]
+                          .filter(Boolean)
+                          .map(id => {
+                            const competency = competencies.find(c => String(c.competency_id) === String(id));
+                            return competency ? (
+                              <span
+                                key={id}
+                                onClick={() => navigate(`/skill/${competency.competency_id}`)}
+                                className={`${getColor(competency.역량명)} text-[10px] px-2 py-0.5 rounded cursor-pointer`}
+                              >
+                                #{competency.역량명}
+                              </span>
+                            ) : null;
+                          })}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {mentor && (
+                        <div className="flex items-center gap-2">
+                          <Avatar
+                            size={20}
+                            name={mentor.mentor_id}
+                            variant="beam"
+                            colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+                          />
+                          <div className="text-[10px] font-medium text-gray-400 truncate">
+                            {mentor.팀} | {mentor['담당 상품']}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* COMPETENCY VIEW */}

@@ -55,34 +55,28 @@ function EpisodePage() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-4 md:p-8">
       <div className="max-w-3xl w-full mx-auto">
-
         <div className="mb-4 text-xs font-medium text-gray-400">
           총 {totalEpisodes}개의 에피소드 중 현재 페이지
-        </div>
-
-        {location.state?.from === 'roleplay' && (
-          <button 
-onClick={() => navigate('/', { state: { from: 'roleplay' } })}
-            className="mb-4 flex items-center text-sm font-bold text-gray-500 hover:text-gray-800"
+          </div>
+          {location.state?.from === 'roleplay' && (
+          <button onClick={() => navigate('/', { state: { from: 'roleplay' } })}
+          className="mb-4 flex items-center text-sm font-bold text-gray-500 hover:text-gray-800"
           >
-            &lt; 롤플레잉으로 돌아가기
+          &lt; 롤플레잉으로 돌아가기
           </button>
         )}
 
         <Header />
 
         <div className="bg-white rounded-2xl p-5 md:p-8 shadow-sm">
-
           {/* ============================================ */}
           {/* 상단 블록: 제목 + 역량 태그 + 멘토           */}
           {/* ============================================ */}
           <div className="bg-gray-50 rounded-xl p-5 mb-8 border border-gray-400">
-
             {/* 제목 */}
             <h1 className="text-xl md:text-3xl font-bold text-gray-800 mb-5">
               {episode.제목}
             </h1>
-
             {/* 역량 태그 */}
             <div className="flex flex-wrap gap-2 mb-5">
               {[
@@ -90,13 +84,11 @@ onClick={() => navigate('/', { state: { from: 'roleplay' } })}
                 episode.competency_id_2,
                 episode.competency_id_3,
                 episode.competency_id_4
-              ]
+                ]
               .filter(Boolean)
-              .map(id => {
-                const competency = competencies.find(
-                  c => String(c.competency_id) === String(id)
-                );
-                return competency ? (
+              .map(id => {const competency = competencies.find(
+                    c => String(c.competency_id) === String(id));
+              return competency ? (
                   <span
                     key={id}
                     onClick={() => navigate(`/skill/${competency.competency_id}`)}
@@ -106,23 +98,20 @@ onClick={() => navigate('/', { state: { from: 'roleplay' } })}
                   </span>
                 ) : null;
               })}
-            </div>
-
-            {/* 멘토 */}
-            {mentor && (
-              <div className="flex items-center gap-3">
-                <Avatar
-                  size={36}
-                  name={mentor.mentor_id}
-                  variant="beam"
-                  colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
-                />
-                <div className="text-xs md:text-sm font-medium text-gray-400">
+                </div> {mentor && (
+                  <div className="flex items-center gap-3">
+                  <Avatar
+                    size={36}
+                    name={mentor.mentor_id}
+                    variant="beam"
+                    colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
+                  />
+              <div className="text-xs md:text-sm font-medium text-gray-400">
                   {mentor.팀} | {mentor['담당 상품']}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
+            )}
+        </div>
           {/* ============================================ */}
           {/* 상단 블록 끝                                 */}
           {/* ============================================ */}

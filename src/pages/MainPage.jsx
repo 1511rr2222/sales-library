@@ -10,6 +10,7 @@ import { AboutPage } from '../components/AboutPage';
 import { CompetencyInfo } from '../components/CompetencyInfo';
 import { CompeAnalysis } from '../components/CompeAnalysis';
 import Avatar from 'boring-avatars';
+import { BookOpen, Award, BarChart2 } from 'lucide-react';
 
 function MainPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,6 +20,7 @@ function MainPage() {
   const [mentors, setMentors] = useState([]);
   const [view, setView] = useState('competency');
   const [loading, setLoading] = useState(true);
+  const [hoveredMenu, setHoveredMenu] = useState(null);
 
   const [selectedCustomer, setSelectedCustomer] = useState('All');
   const [selectedSituation, setSelectedSituation] = useState('All');
@@ -64,11 +66,17 @@ function MainPage() {
 
   if (loading) return <LoadingSpinner />;
 
-  // ✅ 뷰별 transition 클래스 헬퍼
   const viewClass = (name) =>
     view === name
       ? 'transition-all duration-300 opacity-100'
       : 'transition-all duration-300 opacity-0 pointer-events-none absolute inset-0 h-0 overflow-hidden';
+
+  // 사이드바 메뉴 목록
+  const menuItems = [
+    { key: 'AboutPage', label: 'Sales Library 설명', icon: BookOpen },
+    { key: 'CompetencyInfo', label: '역량별 설명', icon: Award },
+    { key: 'CompeAnalysis', label: '오늘의 역량', icon: BarChart2 },
+  ];
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-gray-50">
@@ -81,44 +89,83 @@ function MainPage() {
         />
       )}
 
-      {/* 사이드바 */}
+      {/* ── 사이드바 ── */}
+      {/* 모바일: fixed 오버레이 / 데스크탑: fixed w-16 항상 표시 */}
       <div className={`
-        fixed md:relative z-40 flex-shrink-0
+        fixed z-40 h-full bg-white border-r flex flex-col
         transition-all duration-300
-        bg-white border-r h-full flex flex-col
-        ${isSidebarOpen ? 'w-48' : 'w-0 md:w-16 overflow-hidden'}
+        ${isSidebarOpen ? 'w-48' : 'w-0 md:w-16'}
+        overflow-hidden
       `}>
-        {/* 데스크탑 전용 햄버거 버튼 */}
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="hidden md:block p-4 w-full">
+
+        {/* 데스크탑 햄버거 */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="hidden md:flex p-4 w-full items-center justify-center"
+        >
           <div className="space-y-1.5 flex flex-col items-center">
-            <div className="w-6 h-0.5 bg-gray-600"></div>
-            <div className="w-6 h-0.5 bg-gray-600"></div>
-            <div className="w-6 h-0.5 bg-gray-600"></div>
+            <div className="w-6 h-0.5 bg-gray-600" />
+            <div className="w-6 h-0.5 bg-gray-600" />
+            <div className="w-6 h-0.5 bg-gray-600" />
           </div>
         </button>
-        {isSidebarOpen && (
-          <nav className="flex-1 mt-4 px-2 pt-10 md:pt-0">
-            <button onClick={() => { setView('AboutPage'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">Sales Library 설명</button>
-            <button onClick={() => { setView('CompetencyInfo'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">역량별 설명</button>
-            <button onClick={() => { setView('CompeAnalysis'); setIsSidebarOpen(false); }} className="block w-full text-left p-3 hover:bg-gray-100 rounded">오늘의 역량</button>
-          </nav>
-        )}
+
+        {/* 모바일: 열렸을 때 상단 닫기 여백 */}
+        <div className="md:hidden h-14" />
+
+        {/* 메뉴 아이템 */}
+        <nav className="flex-1 px-2 flex flex-col gap-1">
+          {menuItems.map(({ key, label, icon: Icon }) => (
+            <div key={key} className="relative group">
+              <button
+                onClick={() => { setView(key); setIsSidebarOpen(false); }}
+                onMouseEnter={() => setHoveredMenu(key)}
+                onMouseLeave={() => setHoveredMenu(null)}
+                className="flex items-center gap-3 w-full p-3 hover:bg-gray-100 rounded text-left"
+              >
+                {/* 아이콘: 항상 표시 */}
+                <Icon
+                  size={20}
+                  className={`flex-shrink-0 ${view === key ? 'text-indigo-600' : 'text-gray-500'}`}
+                />
+                {/* 텍스트: 사이드바 열렸을 때만 표시 */}
+                <span className={`
+                  text-sm whitespace-nowrap overflow-hidden
+                  transition-all duration-200
+                  ${isSidebarOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}
+                  ${view === key ? 'text-indigo-600 font-medium' : 'text-gray-700'}
+                `}>
+                  {label}
+                </span>
+              </button>
+
+              {/* 데스크탑 닫힌 상태 툴팁 */}
+              {!isSidebarOpen && hoveredMenu === key && (
+                <div className="hidden md:block absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50">
+                  <div className="bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg">
+                    {label}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
       </div>
 
-      {/* PAGE CONTAINER */}
-      {/* ✅ 수정: min-h-0 추가로 flex 자식이 부모를 넘치지 않도록 */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      {/* ── PAGE CONTAINER ── */}
+      {/* 데스크탑: 사이드바(w-16) 고정 공간만큼 pl-16 확보 */}
+      <div className="flex-1 min-h-0 overflow-y-auto md:pl-16">
         <div className="flex flex-col">
 
-          {/* 모바일 전용 햄버거 버튼 */}
+          {/* 모바일 햄버거 */}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-sm"
           >
             <div className="space-y-1.5 flex flex-col items-center">
-              <div className="w-5 h-0.5 bg-gray-600"></div>
-              <div className="w-5 h-0.5 bg-gray-600"></div>
-              <div className="w-5 h-0.5 bg-gray-600"></div>
+              <div className="w-5 h-0.5 bg-gray-600" />
+              <div className="w-5 h-0.5 bg-gray-600" />
+              <div className="w-5 h-0.5 bg-gray-600" />
             </div>
           </button>
 
@@ -127,33 +174,34 @@ function MainPage() {
           </div>
 
           <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-2 md:p-6">
+
             {/* SWITCH */}
-            {!isSidebarOpen && (
-              <div className="mt-6 mb-8">
-                <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
-                  <div className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
-                    view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0'
-                  }`} />
-                  <button onClick={() => setView('competency')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'competency' ? 'text-gray-800' : 'text-gray-500'}`}>역량</button>
-                  <button onClick={() => setView('roleplay')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'roleplay' ? 'text-gray-800' : 'text-gray-500'}`}>롤플레잉</button>
-                  <button onClick={() => setView('allEpisodes')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'allEpisodes' ? 'text-gray-800' : 'text-gray-500'}`}>전체 에피소드</button>
-                </div>
+            <div className="mt-6 mb-8">
+              <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
+                <div className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
+                  view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0'
+                }`} />
+                <button onClick={() => setView('competency')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'competency' ? 'text-gray-800' : 'text-gray-500'}`}>역량</button>
+                <button onClick={() => setView('roleplay')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'roleplay' ? 'text-gray-800' : 'text-gray-500'}`}>롤플레잉</button>
+                <button onClick={() => setView('allEpisodes')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'allEpisodes' ? 'text-gray-800' : 'text-gray-500'}`}>전체 에피소드</button>
               </div>
-            )}
+            </div>
 
             {/* VIEW AREA */}
-            {/* ✅ 핵심 수정: relative 컨테이너, 숨겨진 뷰에 h-0 overflow-hidden 적용 */}
             <div className="relative">
 
-              {/* 전체 에피소드 view */}
+              {/* 전체 에피소드 */}
               <div className={viewClass('allEpisodes')}>
                 <h3 className="font-bold text-lg mb-4 text-blue-800">모든 에피소드 ({episodes.length}건)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {episodes.map(episode => {
                     const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
                     return (
-                      <div key={episode.episode_id} className="bg-gray-50 rounded-lg p-3 border border-gray-300">
-                        <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{episode.제목}</h1>
+                      <div key={episode.episode_id} 
+                      onClick={() => navigate(`/episode/${episode.episode_id}`)} 
+                       className="bg-gray-50 rounded-lg p-3 border border-gray-300 cursor-pointer hover:border-blue-400 hover:shadow-sm transition-all" 
+                      >  
+                  <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{episode.제목}</h1>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {[episode.competency_id_1, episode.competency_id_2, episode.competency_id_3, episode.competency_id_4]
                             .filter(Boolean)
@@ -162,7 +210,10 @@ function MainPage() {
                               return competency ? (
                                 <span
                                   key={id}
-                                  onClick={() => navigate(`/skill/${competency.competency_id}`)}
+                                  onClick={(e) => { 
+                                  e.stopPropagation(); 
+                                  navigate(`/skill/${competency.competency_id}`); 
+                                  }}
                                   className={`${getColor(competency.역량명)} text-[10px] px-2 py-0.5 rounded cursor-pointer`}
                                 >
                                   #{competency.역량명}
@@ -290,7 +341,6 @@ function MainPage() {
               </div>
 
             </div>
-            {/* VIEW AREA 끝 */}
           </main>
 
           <Footer />

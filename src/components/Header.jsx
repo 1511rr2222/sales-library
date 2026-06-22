@@ -9,19 +9,12 @@ function Header() {
   const isMain = location.pathname === '/';
 
   const goBack = () => navigate(-1);
-  const goHome = () => navigate('/');
 
   const BackButton = () =>
     !isMain && (
       <button
         onClick={goBack}
-        className="
-          w-8 h-8
-          flex items-center justify-center
-          rounded-full
-          text-gray-500
-          hover:bg-gray-200
-        "
+        className="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200"
       >
         <ChevronLeft size={20} />
       </button>
@@ -29,7 +22,7 @@ function Header() {
 
   const Title = ({ isMobile = false }) => (
     <button
-      onClick={goHome}
+      onClick={() => navigate('/')}
       className={isMobile ? 'text-sm font-semibold' : 'text-left w-full'}
     >
       {isMobile ? (
@@ -58,18 +51,12 @@ function Header() {
 
           <div
             className="rounded-xl px-6 py-5 mt-2"
-            style={{
-              backgroundColor: '#f5f3ff',
-              border: '1.5px solid #c4b5fd',
-            }}
+            style={{ backgroundColor: '#f5f3ff', border: '1.5px solid #c4b5fd' }}
           >
             <p className="text-base text-gray-700 leading-relaxed">
               영업 사원 여러분들의 역량 성장을 위한 케이스 라이브러리입니다.
             </p>
-            <p
-              className="text-base font-semibold mt-1"
-              style={{ color: '#7c3aed' }}
-            >
+            <p className="text-base font-semibold mt-1" style={{ color: '#7c3aed' }}>
               습득하고 싶은 역량을 클릭 후 관련 사례를 읽어보며 역량을 길러보세요!
             </p>
           </div>
@@ -78,16 +65,13 @@ function Header() {
     </button>
   );
 
-return (
-    // [수정] 모든 요소가 이 div 안에 들어가야 합니다
+  return (
     <div className="relative w-full">
-      {/* 로고를 div 안쪽으로 배치 */}
-      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-7
-       w-auto opacity-80" />
-      
+      <img src="/logo.png" alt="Logo" className="absolute top-0 right-0 h-7 w-auto opacity-80" />
+
       {/* PC HEADER */}
       <div className="hidden md:block py-10 mb-8 border-b border-gray-200">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 max-w-6xl mx-auto px-6">
           <div className="pt-2">
             <BackButton />
           </div>

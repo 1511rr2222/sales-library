@@ -86,7 +86,7 @@ function SkillPage() {
   return (
     <div
       className="
-        min-h-screen
+        h-auto
         bg-gray-50
         flex
         flex-col

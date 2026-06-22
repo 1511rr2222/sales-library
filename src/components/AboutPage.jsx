@@ -6,12 +6,6 @@ import soloTable from '../solo_table.png';
 export function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white">
-
-      <div className="flex justify-center mb-4">
-        <img src={soloProfile} alt="솔로 프로필" className="w-72 h-60 object-contain" />
-      </div>
-
-      {/* 파란 카드 */}
       <div className="relative bg-blue-50 p-6 rounded-2xl mb-8">
 
         {/* 떠다니는 soloCharacter */}
@@ -24,6 +18,9 @@ export function AboutPage() {
         <div>
           <h2 className="text-xl font-bold text-blue-900">🏠✨안녕하세요! 한솔 큐레이터 '솔로(SOLO)'입니다!</h2>
           <p className="text-gray-600 mt-1">신입 큐레이터 여러분이 최고의 전문가로 성장하도록 꼼꼼하게 도와드릴게요.</p>
+        </div>
+        <div className="flex justify-center mb-4">
+          <img src={soloProfile} alt="솔로 프로필" className="w-100 h-100 object-cover rounded-xl" />
         </div>
       </div>
 

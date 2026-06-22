@@ -99,7 +99,7 @@ export const CompeAnalysis = () => {
     }));
 
   return (
-    <div className="p-8 max-w-5xl mx-auto bg-gray-50 min-h-screen">
+    <div className="p-8 max-w-5xl mx-auto bg-gray-50 h-auto">
       <h1 className="text-2xl font-bold mb-6">오늘의 역량분석</h1>
 
       {/* Solo 캐릭터 */}

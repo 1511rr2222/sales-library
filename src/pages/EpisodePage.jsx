@@ -53,7 +53,7 @@ function EpisodePage() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-4 md:p-8">
+    <div className="h-auto bg-gray-50 px-4 py-4 md:p-8">
       <div className="max-w-3xl w-full mx-auto">
         <div className="mb-4 text-xs font-medium text-gray-400">
           총 {totalEpisodes}개의 에피소드 중 현재 페이지

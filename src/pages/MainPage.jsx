@@ -64,10 +64,16 @@ function MainPage() {
 
   if (loading) return <LoadingSpinner />;
 
-  return (
-    <div className="flex min-h-screen bg-gray-50">
+  // ✅ 뷰별 transition 클래스 헬퍼
+  const viewClass = (name) =>
+    view === name
+      ? 'transition-all duration-300 opacity-100'
+      : 'transition-all duration-300 opacity-0 pointer-events-none absolute inset-0 h-0 overflow-hidden';
 
-      {/* ✅ 수정: 모바일에서 사이드바 열렸을 때 dimmed backdrop - 클릭 시 닫힘 */}
+  return (
+    <div className="flex w-full h-screen overflow-hidden bg-gray-50">
+
+      {/* 모바일 dimmed backdrop */}
       {isSidebarOpen && (
         <div
           className="md:hidden fixed inset-0 bg-black/30 z-30"
@@ -75,11 +81,11 @@ function MainPage() {
         />
       )}
 
-      {/* ✅ 수정: 모바일에서 fixed overlay, 데스크탑에서 기존 방식 유지 */}
+      {/* 사이드바 */}
       <div className={`
-        fixed md:relative z-40
+        fixed md:relative z-40 flex-shrink-0
         transition-all duration-300
-        bg-white border-r h-screen flex flex-col
+        bg-white border-r h-full flex flex-col
         ${isSidebarOpen ? 'w-48' : 'w-0 md:w-16 overflow-hidden'}
       `}>
         {/* 데스크탑 전용 햄버거 버튼 */}
@@ -100,220 +106,195 @@ function MainPage() {
       </div>
 
       {/* PAGE CONTAINER */}
-      {/* ✅ 수정: 모바일에서 전체 너비 사용 (사이드바가 fixed라 공간 차지 안 함) */}
-      <div className="flex-1 flex flex-col min-h-screen w-full">
-        {/* ✅ 수정: 모바일 전용 햄버거 버튼 - 헤더 왼쪽에 고정 */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-sm"
-        >
-          <div className="space-y-1.5 flex flex-col items-center">
-            <div className="w-5 h-0.5 bg-gray-600"></div>
-            <div className="w-5 h-0.5 bg-gray-600"></div>
-            <div className="w-5 h-0.5 bg-gray-600"></div>
-          </div>
-        </button>
+      {/* ✅ 수정: min-h-0 추가로 flex 자식이 부모를 넘치지 않도록 */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-col">
 
-        <div className="py-3 md:py-5">
-          <Header />
-        </div>
-        <main className="flex-grow max-w-6xl w-full mx-auto flex-1 px-4 py-2 md:p-6">
-          {/* SWITCH */}
-          {!isSidebarOpen && (
-          <div className="mt-6 mb-8">
-            <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
-              <div className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
-                  view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0' }`}
-              />
-              <button onClick={() => setView('competency')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'competency' ? 'text-gray-800' : 'text-gray-500'}`}>
-                역량</button>
-              <button onClick={() => setView('roleplay')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'roleplay' ? 'text-gray-800' : 'text-gray-500'}`}>
-                롤플레잉</button>
-              <button onClick={() => setView('allEpisodes')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'allEpisodes' ? 'text-gray-800' : 'text-gray-500'}`}>
-                전체 에피소드</button>
+          {/* 모바일 전용 햄버거 버튼 */}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-sm"
+          >
+            <div className="space-y-1.5 flex flex-col items-center">
+              <div className="w-5 h-0.5 bg-gray-600"></div>
+              <div className="w-5 h-0.5 bg-gray-600"></div>
+              <div className="w-5 h-0.5 bg-gray-600"></div>
             </div>
+          </button>
+
+          <div className="py-3 md:py-5">
+            <Header />
           </div>
-          )}
 
-          {/* VIEW AREA */}
-          <div className="relative min-h-[100vh]">
-
-            {/* 전체에피소드 목록 view */}
-            <div className={`transition-all duration-300 ${view === 'allEpisodes' ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'}`}>
-              <h3 className="font-bold text-lg mb-4 text-blue-800">모든 에피소드 ({episodes.length}건)</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {episodes.map(episode => {
-                  const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
-                  return (
-                    <div key={episode.episode_id} className="bg-gray-50 rounded-lg p-3 border border-gray-300">
-                      <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">
-                        {episode.제목}
-                      </h1>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {[
-                          episode.competency_id_1,
-                          episode.competency_id_2,
-                          episode.competency_id_3,
-                          episode.competency_id_4
-                        ]
-                          .filter(Boolean)
-                          .map(id => {
-                            const competency = competencies.find(c => String(c.competency_id) === String(id));
-                            return competency ? (
-                              <span
-                                key={id}
-                                onClick={() => navigate(`/skill/${competency.competency_id}`)}
-                                className={`${getColor(competency.역량명)} text-[10px] px-2 py-0.5 rounded cursor-pointer`}
-                              >
-                                #{competency.역량명}
-                              </span>
-                            ) : null;
-                          })}
-                      </div>
-                      {mentor && (
-                        <div className="flex items-center gap-2">
-                          <Avatar
-                            size={20}
-                            name={mentor.mentor_id}
-                            variant="beam"
-                            colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
-                          />
-                          <div className="text-[10px] font-medium text-gray-400 truncate">
-                            {mentor.팀} | {mentor['담당 상품']}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* COMPETENCY VIEW */}
-            <div className={`transition-all duration-300 ${view === 'competency' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
-              <div className="flex gap-4 mb-8">
-                <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedCustomer(e.target.value)}>
-                  <option value="All">고객 유형 전체</option>
-                  {customerTypes.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-                <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedSituation(e.target.value)}>
-                  <option value="All">문제 상황 전체</option>
-                  {situations.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-
-              {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (
-                <div className="mb-10">
-                  <h3 className="font-bold text-lg mb-4 text-purple-800">
-                    검색된 에피소드 ({filteredEpisodes.length}건)
-                  </h3>
-                  <div className="space-y-4">
-                    {filteredEpisodes.map(e => {
-                      const mentor = mentors.find(m => String(m.mentor_id) === String(e.mentor_id));
-                      return (
-                        <div
-                          key={e.episode_id}
-                          onClick={() => navigate(`/episode/${e.episode_id}`)}
-                          className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-purple-300 hover:shadow-sm cursor-pointer transition-all border-l-4 border-l-purple-400"
-                        >
-                          <h1 className="text-lg md:text-xl font-bold text-gray-800 mb-3">
-                            {e.제목}
-                          </h1>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {[
-                              e.competency_id_1,
-                              e.competency_id_2,
-                              e.competency_id_3,
-                              e.competency_id_4
-                            ]
-                              .filter(Boolean)
-                              .map(id => {
-                                const competency = competencies.find(c => String(c.competency_id) === String(id));
-                                return competency ? (
-                                  <span
-                                    key={id}
-                                    onClick={(ev) => { ev.stopPropagation(); navigate(`/skill/${competency.competency_id}`); }}
-                                    className={`${getColor(competency.역량명)} text-xs px-3 py-1 rounded-md cursor-pointer`}
-                                  >
-                                    #{competency.역량명}
-                                  </span>
-                                ) : null;
-                              })}
-                          </div>
-                          {mentor && (
-                            <div className="flex items-center gap-3">
-                              <Avatar
-                                size={32}
-                                name={mentor.mentor_id}
-                                variant="beam"
-                                colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]}
-                              />
-                              <div className="text-xs md:text-sm font-medium text-gray-400">
-                                {mentor.팀} | {mentor['담당 상품']}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+          <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-2 md:p-6">
+            {/* SWITCH */}
+            {!isSidebarOpen && (
+              <div className="mt-6 mb-8">
+                <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
+                  <div className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
+                    view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0'
+                  }`} />
+                  <button onClick={() => setView('competency')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'competency' ? 'text-gray-800' : 'text-gray-500'}`}>역량</button>
+                  <button onClick={() => setView('roleplay')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'roleplay' ? 'text-gray-800' : 'text-gray-500'}`}>롤플레잉</button>
+                  <button onClick={() => setView('allEpisodes')} className={`relative z-10 flex-1 py-2 text-sm text-center ${view === 'allEpisodes' ? 'text-gray-800' : 'text-gray-500'}`}>전체 에피소드</button>
                 </div>
-              ) : (
-                areas.map(area => (
-                  <div key={area.name} className="mb-10">
-                    <div className={`mb-4 border-l-4 ${area.color} pl-3`}>
-                      <h2 className="text-xl font-bold leading-tight">{area.name}</h2>
-                      {area.subtitle && <p className="text-xs text-gray-400 mt-0.5">{area.subtitle}</p>}
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {competencies
-                        .filter(c => c.영역 === area.name)
-                        .map(competency => (
-                          <div key={competency.competency_id}
-                               onClick={() => navigate(`/skill/${competency.competency_id}`)}
-                               className={`${area.light} rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer transition-all duration-300 border border-gray-100`}
-                          >
-                            <div className="text-4xl mb-4">{competency.아이콘}</div>
-                            <div className="font-bold text-sm text-gray-900 mb-1.5">{competency.역량명}</div>
-                            <p className="text-[11px] text-gray-500 leading-snug line-clamp-2">
-                              {competency.설명 || "역량 학습 페이지로 이동"}
-                            </p>
+              </div>
+            )}
+
+            {/* VIEW AREA */}
+            {/* ✅ 핵심 수정: relative 컨테이너, 숨겨진 뷰에 h-0 overflow-hidden 적용 */}
+            <div className="relative">
+
+              {/* 전체 에피소드 view */}
+              <div className={viewClass('allEpisodes')}>
+                <h3 className="font-bold text-lg mb-4 text-blue-800">모든 에피소드 ({episodes.length}건)</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {episodes.map(episode => {
+                    const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
+                    return (
+                      <div key={episode.episode_id} className="bg-gray-50 rounded-lg p-3 border border-gray-300">
+                        <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{episode.제목}</h1>
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {[episode.competency_id_1, episode.competency_id_2, episode.competency_id_3, episode.competency_id_4]
+                            .filter(Boolean)
+                            .map(id => {
+                              const competency = competencies.find(c => String(c.competency_id) === String(id));
+                              return competency ? (
+                                <span
+                                  key={id}
+                                  onClick={() => navigate(`/skill/${competency.competency_id}`)}
+                                  className={`${getColor(competency.역량명)} text-[10px] px-2 py-0.5 rounded cursor-pointer`}
+                                >
+                                  #{competency.역량명}
+                                </span>
+                              ) : null;
+                            })}
+                        </div>
+                        {mentor && (
+                          <div className="flex items-center gap-2">
+                            <Avatar size={20} name={mentor.mentor_id} variant="beam" colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]} />
+                            <div className="text-[10px] font-medium text-gray-400 truncate">{mentor.팀} | {mentor['담당 상품']}</div>
                           </div>
-                        ))}
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* COMPETENCY VIEW */}
+              <div className={viewClass('competency')}>
+                <div className="flex gap-4 mb-8">
+                  <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedCustomer(e.target.value)}>
+                    <option value="All">고객 유형 전체</option>
+                    {customerTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedSituation(e.target.value)}>
+                    <option value="All">문제 상황 전체</option>
+                    {situations.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (
+                  <div className="mb-10">
+                    <h3 className="font-bold text-lg mb-4 text-purple-800">검색된 에피소드 ({filteredEpisodes.length}건)</h3>
+                    <div className="space-y-4">
+                      {filteredEpisodes.map(e => {
+                        const mentor = mentors.find(m => String(m.mentor_id) === String(e.mentor_id));
+                        return (
+                          <div
+                            key={e.episode_id}
+                            onClick={() => navigate(`/episode/${e.episode_id}`)}
+                            className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-purple-300 hover:shadow-sm cursor-pointer transition-all border-l-4 border-l-purple-400"
+                          >
+                            <h1 className="text-lg md:text-xl font-bold text-gray-800 mb-3">{e.제목}</h1>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {[e.competency_id_1, e.competency_id_2, e.competency_id_3, e.competency_id_4]
+                                .filter(Boolean)
+                                .map(id => {
+                                  const competency = competencies.find(c => String(c.competency_id) === String(id));
+                                  return competency ? (
+                                    <span
+                                      key={id}
+                                      onClick={(ev) => { ev.stopPropagation(); navigate(`/skill/${competency.competency_id}`); }}
+                                      className={`${getColor(competency.역량명)} text-xs px-3 py-1 rounded-md cursor-pointer`}
+                                    >
+                                      #{competency.역량명}
+                                    </span>
+                                  ) : null;
+                                })}
+                            </div>
+                            {mentor && (
+                              <div className="flex items-center gap-3">
+                                <Avatar size={32} name={mentor.mentor_id} variant="beam" colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]} />
+                                <div className="text-xs md:text-sm font-medium text-gray-400">{mentor.팀} | {mentor['담당 상품']}</div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                ) : (
+                  areas.map(area => (
+                    <div key={area.name} className="mb-10">
+                      <div className={`mb-4 border-l-4 ${area.color} pl-3`}>
+                        <h2 className="text-xl font-bold leading-tight">{area.name}</h2>
+                        {area.subtitle && <p className="text-xs text-gray-400 mt-0.5">{area.subtitle}</p>}
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {competencies
+                          .filter(c => c.영역 === area.name)
+                          .map(competency => (
+                            <div
+                              key={competency.competency_id}
+                              onClick={() => navigate(`/skill/${competency.competency_id}`)}
+                              className={`${area.light} rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer transition-all duration-300 border border-gray-100`}
+                            >
+                              <div className="text-4xl mb-4">{competency.아이콘}</div>
+                              <div className="font-bold text-sm text-gray-900 mb-1.5">{competency.역량명}</div>
+                              <p className="text-[11px] text-gray-500 leading-snug line-clamp-2">
+                                {competency.설명 || "역량 학습 페이지로 이동"}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
 
-            {/* ROLEPLAY VIEW */}
-            <div className={`transition-all duration-300 ${view === 'roleplay' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
-              <RoleplayPanel
-                episodes={episodes}
-                competencies={competencies}
-                selectedCustomer={selectedCustomer}
-                selectedSituation={selectedSituation}
-              />
-            </div>
+              {/* ROLEPLAY VIEW */}
+              <div className={viewClass('roleplay')}>
+                <RoleplayPanel
+                  episodes={episodes}
+                  competencies={competencies}
+                  selectedCustomer={selectedCustomer}
+                  selectedSituation={selectedSituation}
+                />
+              </div>
 
-            {/* ABOUT PAGE VIEW */}
-            <div className={`transition-all duration-300 ${view === 'AboutPage' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
-              <AboutPage />
-            </div>
+              {/* ABOUT PAGE VIEW */}
+              <div className={viewClass('AboutPage')}>
+                <AboutPage />
+              </div>
 
-            {/* COMPETENCY INFO VIEW */}
-            <div className={`transition-all duration-300 ${view === 'CompetencyInfo' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
-              <CompetencyInfo />
-            </div>
-            {/* COMPE ANALYSIS VIEW */}
-            <div className={`transition-all duration-300 ${view === 'CompeAnalysis' ? 'opacity-100 translate-x-0' : 'opacity-0 pointer-events-none -translate-x-4 absolute inset-0'}`}>
-              <CompeAnalysis />
-            </div>
+              {/* COMPETENCY INFO VIEW */}
+              <div className={viewClass('CompetencyInfo')}>
+                <CompetencyInfo />
+              </div>
 
-          </div>
-          {/* VIEW AREA 끝 */}
-        </main>
-        <Footer />
+              {/* COMPE ANALYSIS VIEW */}
+              <div className={viewClass('CompeAnalysis')}>
+                <CompeAnalysis />
+              </div>
+
+            </div>
+            {/* VIEW AREA 끝 */}
+          </main>
+
+          <Footer />
+        </div>
       </div>
     </div>
   );

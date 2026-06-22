@@ -320,6 +320,7 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
               </div>
             )}
 
+
             <div className="flex gap-2">
               <input value={input} disabled={isLoading} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} className="flex-1 border-2 border-purple-100 rounded-xl px-4 py-2" placeholder="메시지 입력..." />
               <button onClick={() => handleSend()} className="bg-purple-600 text-white p-3 rounded-xl"><Send size={18} /></button>

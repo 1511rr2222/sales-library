@@ -41,9 +41,14 @@ function RoleplayPanel({ episodes, competencies, selectedCustomer, selectedSitua
     }).filter(Boolean);
   };
 
-  const cleanReply = (text) => text.replace(/\[CHOICES\][\s\S]*?\[\/CHOICES\]/, '').trim();
-
-  React.useEffect(() => {
+const cleanReply = (text) => text
+  .replace(/\[CHOICES\][\s\S]*?\[\/CHOICES\]/g, '')
+  .replace(/\[호감도 기준점 설정\][\s\S]*?(?=\n\n|$)/g, '')
+  .replace(/\[([^\]]*?\/\s*호감도:\s*\d+점?)\]/g, '')
+  .replace(/---[\s\S]*?---/g, '')
+  .replace(/\*\*\[호감도[^\]]*\]\*\*/g, '')
+  .trim();
+    React.useEffect(() => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem('rp_step', step);
       sessionStorage.setItem('rp_messages', JSON.stringify(messages));

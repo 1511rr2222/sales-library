@@ -176,7 +176,7 @@ function MainPage() {
           <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-2 md:p-6">
 
             {/* SWITCH */}
-            <div className="mt-6 mb-8">
+            <div className="mt-2 mb-8">
               <div className="relative inline-flex w-[360px] bg-gray-200 rounded-full p-1">
                 <div className={`absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out ${
                   view === 'roleplay' ? 'translate-x-[100%]' : view === 'allEpisodes' ? 'translate-x-[200%]' : 'translate-x-0'

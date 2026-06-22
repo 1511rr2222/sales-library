@@ -307,36 +307,35 @@ const cleanReply = (text) => text
               </div>
             ))}
             {isLoading && <div className="text-xs text-purple-400 animate-pulse px-4">작성 중...</div>}
-            {isMistake && (
-              <div className="p-4 bg-white border border-red-200 shadow-sm rounded-2xl flex justify-between items-center mx-4 my-2">
-                <span className="text-xs text-red-600 font-bold">호감도가 하락했습니다.</span>
-                <button onClick={() => navigate(`/episode/${selectedEpisode?.episode_id}`, { state: { from: 'roleplay' } })} className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm">우수사례</button>
-              </div>
-            )}
           </div>
+{favorabilityState && (
+  <div className="px-4 pb-2">
+    <div className={`p-3 rounded-xl flex justify-between items-center ${
+      favorabilityState === 'down' ? 'bg-red-50 border border-red-200' :
+      favorabilityState === 'up' ? 'bg-green-50 border border-green-200' :
+      'bg-gray-50 border border-gray-200'
+    }`}>
+      <span className={`text-xs font-bold ${
+        favorabilityState === 'down' ? 'text-red-600' :
+        favorabilityState === 'up' ? 'text-green-600' :
+        'text-gray-500'
+      }`}>
+        {favorabilityState === 'up' && '📈 호감도 상승'}
+        {favorabilityState === 'down' && '📉 호감도 하락'}
+        {favorabilityState === 'neutral' && '➖ 변화 없음'}
+      </span>
+      {favorabilityState === 'down' && (
+        <button
+          onClick={() => navigate(`/episode/${selectedEpisode?.episode_id}`, { state: { from: 'roleplay' } })}
+          className="text-xs font-bold text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          우수사례 보기
+        </button>
+      )}
+    </div>
+  </div>
+)}
 
-                {favorabilityState && (
-      <div className="px-4 pb-2">
-        <div className={`p-3 border rounded-xl flex justify-between ${
-          favorabilityState === 'down' ? 'border-red-300' :
-          favorabilityState === 'up' ? 'border-green-300' : 'border-gray-300'
-        }`}>
-          <span className="text-xs font-bold">
-            {favorabilityState === 'up' && '호감도 상승'}
-            {favorabilityState === 'down' && '호감도 하락'}
-            {favorabilityState === 'neutral' && '변화 없음'}
-          </span>
-          {favorabilityState === 'down' && (
-            <button
-              onClick={() => navigate(`/episode/${selectedEpisode?.episode_id}`, { state: { from: 'roleplay' } })}
-              className="text-xs text-red-500"
-            >
-              우수사례
-            </button>
-          )}
-        </div>
-      </div>
-    )}
 
           <div className="p-4 border-t border-purple-50">
             <button onClick={handleHint} className="w-full mb-4 py-2 text-xs font-bold text-purple-600 bg-purple-50 rounded-xl hover:bg-purple-100">

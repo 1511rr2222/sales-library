@@ -41,6 +41,45 @@ const GroupRadarChart = ({ data, color, fill }) => (
     </RadarChart>
   </ResponsiveContainer>
 );
+const FeedbackBlock = ({ text }) => {
+  if (!text) return null;
+
+  // 섹션 파싱: '강점:', '개선 필요:', '코칭 포인트:' 기준으로 분리
+  const sections = [
+    { key: '강점', emoji: '💪', color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+    { key: '개선 필요', emoji: '🌱', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-100' },
+    { key: '코칭 포인트', emoji: '🎯', color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-100' },
+  ];
+
+    const parsed = sections.map(({ key, emoji, color, bg, border }) => {
+    const regex = new RegExp(`${key}:\\s*([\\s\\S]*?)(?=강점:|개선 필요:|코칭 포인트:|$)`);
+    const match = text.match(regex);
+    const content = match ? match[1].trim() : '';
+    const items = content.split('\n').map(l => l.replace(/^-\s*/, '').trim()).filter(Boolean);
+    return { key, emoji, color, bg, border, items };
+  });
+  
+  return (
+    <div className="space-y-3">
+      {parsed.map(({ key, emoji, color, bg, border, items }) =>
+        items.length > 0 && (
+          <div key={key} className={`rounded-xl border ${border} ${bg} p-4`}>
+            <div className={`font-bold text-sm mb-2 ${color}`}>{emoji} {key}</div>
+            <ul className="space-y-1.5">
+              {items.map((item, i) => (
+                <li key={i} className={`text-sm ${color} flex gap-2`}>
+                  <span className="mt-0.5 flex-shrink-0">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      )}
+    </div>
+  );
+};
+
 
 export const CompeAnalysis = () => {
   const [memo, setMemo] = useState('');
@@ -246,16 +285,14 @@ export const CompeAnalysis = () => {
           </div>
 
           {/* Solo 피드백 */}
-          <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 flex gap-4 items-start">
-            <img src={soloCharacter} alt="솔로" className="w-12 h-12 flex-shrink-0" />
-            <div className="flex-1">
-              <h4 className="font-bold text-indigo-800 mb-3">Solo의 코칭 리포트</h4>
-              <p className="text-sm text-indigo-700 leading-relaxed whitespace-pre-line">
-                {analysisResult.Feedback}
-              </p>
+          
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+            <img src={soloCharacter} alt="솔로" className="w-10 h-10 flex-shrink-0" />
+            <h4 className="font-bold text-gray-800">Solo의 코칭 리포트</h4>
             </div>
+            <FeedbackBlock text={analysisResult.Feedback} />
           </div>
-
         </div>
       )}
     </div>

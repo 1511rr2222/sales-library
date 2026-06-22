@@ -193,15 +193,26 @@ function MainPage() {
               {/* 전체 에피소드 */}
               <div className={viewClass('allEpisodes')}>
                 <h3 className="font-bold text-lg mb-4 text-blue-800">모든 에피소드 ({episodes.length}건)</h3>
+                <div className="flex gap-4 mb-8">
+                  <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedCustomer(e.target.value)}>
+                    <option value="All">고객 유형 전체</option>
+                    {customerTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedSituation(e.target.value)}>
+                    <option value="All">문제 상황 전체</option>
+                    {situations.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {episodes.map(episode => {
-                    const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
-                    return (
+                 {filteredEpisodes.map(episode => {
+                  const mentor = mentors.find(m => String(m.mentor_id) === String(episode.mentor_id));
+                  return (
                       <div key={episode.episode_id} 
                       onClick={() => navigate(`/episode/${episode.episode_id}`)} 
                        className="bg-gray-50 rounded-lg p-3 border border-gray-300 cursor-pointer hover:border-blue-400 hover:shadow-sm transition-all" 
                       >  
-                  <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{episode.제목}</h1>
+                      <h1 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{episode.제목}</h1>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {[episode.competency_id_1, episode.competency_id_2, episode.competency_id_3, episode.competency_id_4]
                             .filter(Boolean)
@@ -235,59 +246,8 @@ function MainPage() {
 
               {/* COMPETENCY VIEW */}
               <div className={viewClass('competency')}>
-                <div className="flex gap-4 mb-8">
-                  <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedCustomer(e.target.value)}>
-                    <option value="All">고객 유형 전체</option>
-                    {customerTypes.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                  <select className="flex-1 p-3 rounded-xl border border-gray-200 text-sm" onChange={(e) => setSelectedSituation(e.target.value)}>
-                    <option value="All">문제 상황 전체</option>
-                    {situations.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-
-                {(selectedCustomer !== 'All' || selectedSituation !== 'All') ? (
-                  <div className="mb-10">
-                    <h3 className="font-bold text-lg mb-4 text-purple-800">검색된 에피소드 ({filteredEpisodes.length}건)</h3>
-                    <div className="space-y-4">
-                      {filteredEpisodes.map(e => {
-                        const mentor = mentors.find(m => String(m.mentor_id) === String(e.mentor_id));
-                        return (
-                          <div
-                            key={e.episode_id}
-                            onClick={() => navigate(`/episode/${e.episode_id}`)}
-                            className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-purple-300 hover:shadow-sm cursor-pointer transition-all border-l-4 border-l-purple-400"
-                          >
-                            <h1 className="text-lg md:text-xl font-bold text-gray-800 mb-3">{e.제목}</h1>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              {[e.competency_id_1, e.competency_id_2, e.competency_id_3, e.competency_id_4]
-                                .filter(Boolean)
-                                .map(id => {
-                                  const competency = competencies.find(c => String(c.competency_id) === String(id));
-                                  return competency ? (
-                                    <span
-                                      key={id}
-                                      onClick={(ev) => { ev.stopPropagation(); navigate(`/skill/${competency.competency_id}`); }}
-                                      className={`${getColor(competency.역량명)} text-xs px-3 py-1 rounded-md cursor-pointer`}
-                                    >
-                                      #{competency.역량명}
-                                    </span>
-                                  ) : null;
-                                })}
-                            </div>
-                            {mentor && (
-                              <div className="flex items-center gap-3">
-                                <Avatar size={32} name={mentor.mentor_id} variant="beam" colors={["#FF6B6B", "#FFE66D", "#4ECDC4", "#45B7D1", "#96CEB4"]} />
-                                <div className="text-xs md:text-sm font-medium text-gray-400">{mentor.팀} | {mentor['담당 상품']}</div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  areas.map(area => (
+                
+                   {areas.map(area => (
                     <div key={area.name} className="mb-10">
                       <div className={`mb-4 border-l-4 ${area.color} pl-3`}>
                         <h2 className="text-xl font-bold leading-tight">{area.name}</h2>
@@ -311,8 +271,7 @@ function MainPage() {
                           ))}
                       </div>
                     </div>
-                  ))
-                )}
+                  ))}
               </div>
 
               {/* ROLEPLAY VIEW */}

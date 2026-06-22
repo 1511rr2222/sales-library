@@ -81,7 +81,7 @@ ${JSON.stringify(competencyData, null, 2)}
     "전략적 시장리딩": 0,
     "파트너십 매니지먼트": 0
   },
-  "Feedback": "여기에 코칭 피드백"
+"Feedback": "아래 형식을 반드시 지켜서 작성: \n강점:\n- [내용]\n- [내용]\n\n개선 필요:\n- [내용]\n- [내용]\n\n코칭 포인트:\n- [내용]"
 }`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -94,7 +94,7 @@ ${JSON.stringify(competencyData, null, 2)}
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1500,
-        system: '반드시 JSON만 출력하세요. 마크다운 코드블록이나 설명 문장은 절대 출력하지 마세요.',
+        system: '반드시 JSON만 출력하세요. 마크다운 코드블록이나 설명 문장은 절대 출력하지 마세요. Feedback 필드는 반드시 강점:, 개선 필요:, 코칭 포인트: 세 섹션으로 나누고 각 항목은 줄바꿈과 "- "으로 시작하세요.',
         messages: [
           { role: 'user', content: systemPrompt + '\n\n[세일즈 메모]\n' + memo }
         ],

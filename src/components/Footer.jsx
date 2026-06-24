@@ -8,7 +8,7 @@ function Footer() {
         <span>© Sales Library</span>
         <span>·</span>
         <a
-          href="https://github.com/1511rr2222/sales-library.git"
+          href="https://github.com/sso06069-crypto/sales-library.git"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1 hover:text-gray-600 transition-all"
